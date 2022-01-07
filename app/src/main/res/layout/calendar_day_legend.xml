@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/legendLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/legendText1"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/mon"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/legendText2"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/tuesday"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/legendText3"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/wednesday"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/legendText4"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/thursday"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/legendText5"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/friday"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/legendText6"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/saturday"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/legendText7"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/sunday"
+        android:textColor="@color/day_legend_color"
+        android:textSize="12sp" />
+
+</LinearLayout>

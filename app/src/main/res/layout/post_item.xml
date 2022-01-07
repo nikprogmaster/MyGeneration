@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/MyCardViewStyle"
+    android:layout_marginTop="@dimen/small"
+    android:layout_marginBottom="@dimen/small"
+    android:layout_marginStart="@dimen/medium"
+    android:layout_marginEnd="@dimen/medium"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/main_text"
+            android:layout_width="@dimen/zero"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/medium"
+            android:layout_marginTop="@dimen/small"
+            android:layout_marginEnd="@dimen/medium"
+            android:ellipsize="end"
+            android:maxLines="5"
+            tools:text="Ой какая интересная новость, просто шок-контент, хочу, чтобы все ее увидели и прочитали"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/show_full_text"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/zero"
+            android:layout_marginStart="@dimen/medium"
+            android:layout_marginTop="@dimen/xxsmall"
+            android:layout_marginEnd="@dimen/medium"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/show_full"
+            android:textColor="@color/secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_text"/>
+
+        <com.smarteist.autoimageslider.SliderView
+            android:id="@+id/photos_gallery"
+            android:layout_width="@dimen/zero"
+            android:layout_height="200dp"
+            android:layout_marginStart="@dimen/medium"
+            android:layout_marginTop="@dimen/xxsmall"
+            android:layout_marginEnd="@dimen/medium"
+            app:sliderAnimationDuration="300"
+            app:sliderAutoCycleDirection="back_and_forth"
+            app:sliderAutoCycleEnabled="true"
+            app:sliderIndicatorAnimationDuration="300"
+            app:sliderIndicatorGravity="center_horizontal|bottom"
+            app:sliderIndicatorMargin="@dimen/sliderIndicatorMargin"
+            app:sliderIndicatorOrientation="horizontal"
+            app:sliderIndicatorPadding="@dimen/little"
+            app:sliderIndicatorRadius="@dimen/sliderIndicatorRadius"
+            app:sliderIndicatorSelectedColor="@color/gray"
+            app:sliderIndicatorUnselectedColor="@color/white"
+            app:sliderScrollTimeInSec="4"
+            app:sliderStartAutoCycle="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/show_full_text"
+            app:layout_constraintBottom_toTopOf="@+id/views_number"/>
+
+        <TextView
+            android:id="@+id/views_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium"
+            tools:text="1.6k"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/views_image"
+            app:layout_constraintBottom_toBottomOf="@+id/views_image" />
+
+        <ImageView
+            android:id="@+id/views_image"
+            android:layout_width="@dimen/medium"
+            android:layout_height="@dimen/medium"
+            android:layout_marginEnd="@dimen/xxxsmall"
+            android:layout_marginTop="@dimen/xxxsmall"
+            android:layout_marginBottom="@dimen/xxxsmall"
+            android:src="@drawable/views"
+            app:layout_constraintTop_toBottomOf="@+id/photos_gallery"
+            app:layout_constraintEnd_toStartOf="@+id/views_number"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/likes_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium"
+            android:layout_marginTop="@dimen/medium"
+            tools:text="53"
+            android:textSize="12sp"
+            android:layout_marginBottom="@dimen/medium"
+            app:layout_constraintEnd_toStartOf="@id/views_image"
+            app:layout_constraintTop_toTopOf="@+id/liked_image"
+            app:layout_constraintBottom_toBottomOf="@+id/liked_image"/>
+
+
+        <ImageView
+            android:id="@+id/liked_image"
+            android:layout_width="@dimen/medium"
+            android:layout_height="@dimen/medium"
+            android:layout_marginEnd="@dimen/xxxsmall"
+            android:layout_marginTop="@dimen/xxxsmall"
+            android:layout_marginBottom="@dimen/xxxsmall"
+            android:src="@drawable/liked"
+            app:layout_constraintTop_toBottomOf="@+id/photos_gallery"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/likes_number"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

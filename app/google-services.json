@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "599814783317",
+    "firebase_url": "https://mygeneration-a32eb.firebaseio.com",
+    "project_id": "mygeneration-a32eb",
+    "storage_bucket": "mygeneration-a32eb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599814783317:android:c9385ad80c73a0ce79afdc",
+        "android_client_info": {
+          "package_name": "com.kandyba.mygeneration"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599814783317-84lsbeaupinvn2usm51pr2rmnq34tnoo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4GX0CoIWeXMYEvxo1ioA5iIbqCddQ9X8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599814783317-84lsbeaupinvn2usm51pr2rmnq34tnoo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

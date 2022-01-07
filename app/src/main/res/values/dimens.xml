@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="sign_button_corner_dimen">8dp</dimen>
+
+    <dimen name="zero">0dp</dimen>
+    <dimen name="tiny">1dp</dimen>
+    <dimen name="little">2dp</dimen>
+    <dimen name="xxxsmall">4dp</dimen>
+    <dimen name="xxsmall">8dp</dimen>
+    <dimen name="xsmall">10dp</dimen>
+    <dimen name="small">12dp</dimen>
+    <dimen name="medium">16dp</dimen>
+    <dimen name="large">20dp</dimen>
+    <dimen name="xlarge">24dp</dimen>
+    <dimen name="xxlarge">28dp</dimen>
+    <dimen name="xxxlarge">32dp</dimen>
+    <dimen name="sliderIndicatorMargin">15dp</dimen>
+    <dimen name="sliderIndicatorRadius">1dp</dimen>
+    <dimen name="profile_avatar_dimen">204dp</dimen>
+    <dimen name="profile_avatar_margin">64dp</dimen>
+
+</resources>

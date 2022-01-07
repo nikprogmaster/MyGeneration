@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval" android:innerRadius="32dp">
+            <solid android:color="#a0a9b0"/>
+        </shape>
+    </item>
+    <item android:drawable="@drawable/person_profile"/>
+
+</layer-list>

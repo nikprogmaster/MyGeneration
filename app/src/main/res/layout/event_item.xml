@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/event_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="1."/>
+
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="@dimen/zero"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        android:layout_marginEnd="@dimen/medium"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/event_number"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Встреча для лидеров МП" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        android:layout_marginTop="@dimen/xxsmall"
+        tools:text="25 января"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_title" />
+
+    <ImageView
+        android:id="@+id/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        android:src="@drawable/ic_circle_black_4"
+        app:layout_constraintBottom_toBottomOf="@+id/date"
+        app:layout_constraintStart_toEndOf="@+id/date"
+        app:layout_constraintTop_toTopOf="@+id/date" />
+
+    <TextView
+        android:id="@+id/event_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        tools:text="12:00 - 14:00"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/divider"
+        app:layout_constraintStart_toEndOf="@+id/divider"
+        app:layout_constraintTop_toTopOf="@+id/divider" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_marginEnd="@dimen/medium"
+        android:layout_marginBottom="@dimen/medium"
+        android:ellipsize="end"
+        android:maxLines="5"
+        tools:text="Важная встреча для каждого из нас и т д и т п "
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

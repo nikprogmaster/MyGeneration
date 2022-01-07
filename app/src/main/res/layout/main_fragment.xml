@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/title_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/xxsmall"
+        android:background="@drawable/pressed_selector"
+        android:paddingBottom="@dimen/xxsmall"
+        android:paddingTop="@dimen/xxsmall"
+        android:paddingStart="@dimen/small"
+        android:paddingEnd="@dimen/small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/date_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@color/day_legend_color"
+            tools:text="Ноябрь, 21" />
+
+        <ImageView
+            android:id="@+id/month_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/arrow_drop_down"
+            android:layout_gravity="bottom"
+            />
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/legend"
+        layout="@layout/calendar_day_legend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/xxsmall"
+        app:layout_constraintTop_toBottomOf="@+id/title_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <com.kizitonwose.calendarview.CalendarView
+        android:id="@+id/calendar_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cv_scrollMode="paged"
+        app:cv_inDateStyle="allMonths"
+        app:cv_orientation="horizontal"
+        app:cv_outDateStyle="endOfRow"
+        app:cv_dayViewResource="@layout/calendar_day_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/legend" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/posts_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/zero"
+        android:layout_marginTop="@dimen/xxxsmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/calendar_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

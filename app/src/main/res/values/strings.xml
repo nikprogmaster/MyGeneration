@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">MyGeneration</string>
+    <string name="menu_main">Главная</string>
+    <string name="menu_ideas">Идеи</string>
+    <string name="menu_diary">Дневник</string>
+    <string name="menu_messenger">Мессенджер</string>
+    <string name="menu_dreams">Мечты</string>
+    <string name="my_generation">Мое Поколение</string>
+    <string name="mon">ПН</string>
+    <string name="tuesday">ВТ</string>
+    <string name="wednesday">СР</string>
+    <string name="thursday">ЧТ</string>
+    <string name="friday">ПТ</string>
+    <string name="saturday">СБ</string>
+    <string name="sunday">ВС</string>
+    <string name="profile">Профиль</string>
+    <string name="login">Логин</string>
+    <string name="account_type">Тип учетной записи</string>
+    <string name="phone">Телефон</string>
+    <string name="birthday">Дата рождения</string>
+    <string name="city">Город</string>
+    <string name="auth_explanation">Чтобы использовать все \n функции приложения, авторизуйтесь</string>
+    <string name="enter">Войти</string>
+    <string name="name">Имя</string>
+    <string name="save">Сохранить</string>
+    <string name="show_full">Показать полностью</string>
+    <string name="roll_up">Свернуть</string>
+    <string name="zero">0</string>
+</resources>
