@@ -1,13 +1,12 @@
 
 package com.kandyba.mygeneration.presentation.viewmodel
 
-import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -26,14 +25,13 @@ class ProfileViewModel @Inject constructor(
     private val showLoggedUserLayout = MutableLiveData<Boolean>()
     private val userInfo = MutableLiveData<User>()
     private val signInUser = MutableLiveData<Unit>()
-    private val sharedPreferencesUserInfo = MutableLiveData<User>()
+    private val sharedPreferencesUserInfo = MutableLiveData<Map<UserField, String?>>()
     private val showReservedUserInfo = MutableLiveData<Unit>()
     private val showProgressBar = MutableLiveData<Boolean>()
     private val clearSharedPreferences = MutableLiveData<Unit>()
 
     private lateinit var auth: FirebaseAuth
     private lateinit var settings: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
 
     val showLoggedUserLayoutLiveData: LiveData<Boolean>
         get() = showLoggedUserLayout
@@ -41,7 +39,7 @@ class ProfileViewModel @Inject constructor(
         get() = userInfo
     val signInUserLiveData: LiveData<Unit>
         get() = signInUser
-    val sharedPreferencesUserInfoLiveData: LiveData<User>
+    val sharedPreferencesUserInfoLiveData: LiveData<Map<UserField, String?>>
         get() = sharedPreferencesUserInfo
     val showReservedUserInfoLiveData: LiveData<Unit>
         get() = showReservedUserInfo
@@ -50,11 +48,9 @@ class ProfileViewModel @Inject constructor(
     val clearSharedPreferencesLiveData: LiveData<Unit>
         get() = clearSharedPreferences
 
-    @SuppressLint("CommitPrefEdits")
     fun init(prefs: SharedPreferences) {
         auth = FirebaseAuth.getInstance()
         settings = prefs
-        editor = settings.edit()
 
         auth.currentUser?.reload()?.addOnCompleteListener {
             val user = auth.currentUser
@@ -62,15 +58,12 @@ class ProfileViewModel @Inject constructor(
                 showLoggedUserLayout.value = false
                 clearSharedPreferences.value = Unit
                 deleteUserFromDatabase()
-                Log.i("User", "is null")
             } else {
                 showReservedUserInfo.value = Unit
                 showLoggedUserLayout.value = true
-                Log.i("User", "is not null")
             }
         }
     }
-
 
     fun successfullySigned(firebaseUser: FirebaseUser, providerType: String? = null) {
         showLoggedUserLayout.value = true
@@ -86,7 +79,7 @@ class ProfileViewModel @Inject constructor(
                 var user = snapshot.getValue(User::class.java)
                 if (user != null) {
                     userInfo.value = user
-                    sharedPreferencesUserInfo.value = user
+                    sharedPreferencesUserInfo.value = userConverter.convertForSettings(user)
                     showProgressBar.value = false
                 } else {
                     user = providerType?.let { createUser(firebaseUser, it) }
@@ -101,7 +94,7 @@ class ProfileViewModel @Inject constructor(
     private fun deleteUserFromDatabase() {
         val databaseReference = FirebaseDatabase.getInstance().reference
         val ref = databaseReference.child(USER_DATABASE_ENDPOINT).child(
-            settings.getString(USER_ID_KEY, EMPTY_STRING) ?: EMPTY_STRING
+            settings.getString(UserField.ID.preferencesKey, EMPTY_STRING) ?: EMPTY_STRING
         )
         ref.removeValue()
     }
@@ -109,26 +102,26 @@ class ProfileViewModel @Inject constructor(
     private fun createUser(firebaseUser: FirebaseUser, providerType: String) =
         User(
             firebaseUser.uid,
-            firebaseUser.displayName ?: "",
+            firebaseUser.displayName ?: EMPTY_STRING,
             providerType,
-            firebaseUser.email ?: "",
-            firebaseUser.phoneNumber ?: "",
-            "",
+            firebaseUser.email ?: EMPTY_STRING,
+            firebaseUser.phoneNumber ?: EMPTY_STRING,
+            EMPTY_STRING,
             AccountType.TEAMER.title,
-            "",
-            ""
+            EMPTY_STRING,
+            EMPTY_STRING
         )
 
 
-    fun changeUserInfo(changedFields: MutableMap<UserField, String>) {
+    fun changeUserInfo(changedFields: Map<UserField, String>) {
         for (i in changedFields) {
             when (i.key) {
-                UserField.FIO -> changeUserField(NAME_ENDPOINT, i.value)
-                UserField.PHONE -> changeUserField(PHONE_NUMBER_ENDPOINT, i.value)
-                UserField.CITY -> changeUserField(CITY_ENDPOINT, i.value)
-                UserField.BIRTHDAY -> changeUserField(BIRTHDAY_ENDPOINT, i.value)
-                UserField.ACCOUNT_TYPE -> changeUserField(ACCOUNT_ENDPOINT, i.value)
-                UserField.EMAIL -> changeUserField(EMAIL_ENDPOINT, i.value)
+                UserField.NAME -> changeUserField(i.key.preferencesKey, i.value)
+                UserField.PHONE -> changeUserField(i.key.preferencesKey, i.value)
+                UserField.CITY -> changeUserField(i.key.preferencesKey, i.value)
+                UserField.BIRTHDAY -> changeUserField(i.key.preferencesKey, i.value)
+                UserField.ACCOUNT_TYPE -> changeUserField(i.key.preferencesKey, i.value)
+                UserField.EMAIL -> changeUserField(i.key.preferencesKey, i.value)
             }
         }
         auth.currentUser?.let { successfullySigned(it) }
@@ -153,12 +146,5 @@ class ProfileViewModel @Inject constructor(
 
     companion object {
         private const val USER_DATABASE_ENDPOINT = "users"
-        private const val NAME_ENDPOINT = "name"
-        private const val PHONE_NUMBER_ENDPOINT = "phoneNumber"
-        private const val EMAIL_ENDPOINT = "email"
-        private const val ACCOUNT_ENDPOINT = "accountType"
-        private const val CITY_ENDPOINT = "city"
-        private const val BIRTHDAY_ENDPOINT = "birthday"
-        private const val USER_ID_KEY = "id"
     }
 }

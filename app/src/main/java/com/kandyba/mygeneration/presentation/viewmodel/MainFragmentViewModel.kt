@@ -9,25 +9,26 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.kandyba.mygeneration.domain.WallInteractor
 import com.kandyba.mygeneration.models.data.WallResponse
+import com.kandyba.mygeneration.models.presentation.SingleLiveEvent
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.ReplaySubject
 
 class MainFragmentViewModel(
-    private val wallInteractor: WallInteractor
+    private val wallInteractor: WallInteractor,
+    private val areEventsLoaded: ReplaySubject<Unit>,
+    private val areVkPostsLoaded: ReplaySubject<Unit>
 ) : BaseViewModel() {
 
     private val getEvents = MutableLiveData<List<Event>>()
-    private val openBottomCalendarFragment = MutableLiveData<List<Event>>()
-    private val showStartAnimation = MutableLiveData<Boolean>()
+    private val openBottomCalendarFragment = SingleLiveEvent<List<Event>>()
     private val vkPosts = MutableLiveData<WallResponse>()
 
     val getEventsLiveData: LiveData<List<Event>>
         get() = getEvents
     val openBottomCalendarFragmentLiveData: LiveData<List<Event>>
         get() = openBottomCalendarFragment
-    val showStartAnimationLiveData: LiveData<Boolean>
-        get() = showStartAnimation
     val vkPostsLiveData: LiveData<WallResponse>
         get() = vkPosts
 
@@ -36,7 +37,7 @@ class MainFragmentViewModel(
         val ref = databaseReference.child(CALENDAR_DATABASE_ENDPOINT)
         ref.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
-                showStartAnimation.value = false
+                areEventsLoaded.onNext(Unit)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -47,7 +48,7 @@ class MainFragmentViewModel(
                         eventList.add(event)
                 }
                 getEvents.value = eventList
-                showStartAnimation.value = false
+                areEventsLoaded.onNext(Unit)
             }
         })
     }
@@ -56,14 +57,16 @@ class MainFragmentViewModel(
         wallInteractor.getWallPosts(postCount)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doFinally { areVkPostsLoaded.onNext(Unit) }
             .subscribe(
                 {
                     Log.i("Posts", it.response.items.toString())
                     vkPosts.postValue(it)
+                    areVkPostsLoaded.onNext(Unit)
                 },
                 {
-                    Log.e("VkError", "Что-то не так")
-                    //showError
+                    Log.e("VkError", it.message.toString())
+                    areVkPostsLoaded.onNext(Unit)
                 }
             ).addTo(rxCompositeDisposable)
     }

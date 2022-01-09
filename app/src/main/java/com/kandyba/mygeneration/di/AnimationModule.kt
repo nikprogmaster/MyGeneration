@@ -9,10 +9,8 @@ import dagger.Provides
 class AnimationModule {
 
     @Provides
-    fun provideAnimationHelper() =
-        AnimationHelper()
+    fun provideAnimationHelper() = AnimationHelper()
 
     @Provides
-    fun provideProfileAnimation() =
-        ProfileAnimation()
+    fun provideProfileAnimation() = ProfileAnimation()
 }

@@ -22,10 +22,11 @@ import com.kandyba.mygeneration.presentation.animation.AnimationHelper
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.fragments.BottomCalendarDialogFragment
 import com.kandyba.mygeneration.presentation.viewmodel.AppViewModel
+import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
 import com.kandyba.mygeneration.presentation.viewmodel.factories.AppViewModelFactory
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), FragmentNavigator {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var loadLayout: LinearLayout
     private lateinit var logo: ImageView
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
 
     private lateinit var animatorsList: List<Animator>
     private lateinit var animationListener: AnimationListener
-    private lateinit var viewModel: AppViewModel
+    private lateinit var appViewModel: AppViewModel
 
     @Inject
     lateinit var animationHelper: AnimationHelper
@@ -49,21 +50,21 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         (application as App).appComponent.injectMainActivity(this)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(AppViewModel::class.java)
+        appViewModel = ViewModelProvider(this, viewModelFactory).get(AppViewModel::class.java)
         initViews()
         initObservers()
     }
 
     private fun initObservers() {
-        viewModel.init()
-        viewModel.showAnimationLiveData.observe(this, Observer { show ->
+        appViewModel.init()
+        appViewModel.showAnimationLiveData.observe(this, Observer { show ->
             animatorsList = animationHelper.setAnimation(logo, animationListener)
             animationHelper.showAnimation(animatorsList, show)
         })
-        viewModel.launchProfileLiveData.observe(this, Observer { launchProfile(Unit) })
-        viewModel.openMainFragmentLiveData.observe(this, Observer {
+        appViewModel.launchProfileLiveData.observe(this, Observer { launchProfile(Unit) })
+        appViewModel.openMainFragmentLiveData.observe(this, Observer {
             openFragment(MainFragment.newInstance()) })
-    }
+        }
 
     private fun initViews() {
         loadLayout = findViewById(R.id.loading)
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
 
     private fun setListeners() {
         profileButton.setOnClickListener {
-            viewModel.launchProfileActivity()
+            appViewModel.launchProfileActivity()
         }
         navigation.setOnNavigationItemSelectedListener { item: MenuItem ->
             navigateFragment(item.itemId)
@@ -118,12 +119,8 @@ class MainActivity : AppCompatActivity(), FragmentNavigator {
         startActivity(intent)
     }
 
-    override fun openBottomSheetFragment(event: List<Event>) {
+    fun openBottomSheetFragment(event: List<Event>) {
         BottomCalendarDialogFragment.newInstance(event)
             .show(supportFragmentManager, null)
-    }
-
-    override fun showStartAnimation(show: Boolean) {
-        viewModel.showAnimation(show)
     }
 }

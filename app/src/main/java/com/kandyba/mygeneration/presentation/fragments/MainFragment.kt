@@ -17,7 +17,7 @@ import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.CalendarManager
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.models.presentation.calendar.addEventsToMap
-import com.kandyba.mygeneration.presentation.activities.FragmentNavigator
+import com.kandyba.mygeneration.presentation.activities.MainActivity
 import com.kandyba.mygeneration.presentation.adapters.PostsAdapter
 import com.kandyba.mygeneration.presentation.binder.CalendarDayBinder
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
@@ -59,7 +59,10 @@ class MainFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         (requireActivity().application as App).appComponent.injectMainFragment(this)
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[MainFragmentViewModel::class.java]
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            viewModelFactory
+        )[MainFragmentViewModel::class.java]
         initObservers()
 
         viewModel.loadEvents()
@@ -71,11 +74,8 @@ class MainFragment : Fragment() {
             setCalendarDayBinder(events)
             setCalendarManager()
         })
-        viewModel.openBottomCalendarFragmentLiveData.observe(requireActivity(), Observer { event ->
-            (requireActivity() as FragmentNavigator).openBottomSheetFragment(event)
-        })
-        viewModel.showStartAnimationLiveData.observe(requireActivity(), Observer { show ->
-            (requireActivity() as FragmentNavigator).showStartAnimation(show)
+        viewModel.openBottomCalendarFragmentLiveData.observe(requireActivity(), Observer { events ->
+            openBottomSheetFragment(events)
         })
         viewModel.vkPostsLiveData.observe(requireActivity(), Observer { resp ->
             resp.response.items?.let {
@@ -83,6 +83,12 @@ class MainFragment : Fragment() {
                 postsRecyclerView.adapter = postsAdapter
             }
         })
+    }
+    private fun openBottomSheetFragment(events: List<Event>) {
+        val activity = requireActivity()
+        if (activity is MainActivity) {
+            activity.openBottomSheetFragment(events)
+        }
     }
 
     private fun setCalendarManager() {

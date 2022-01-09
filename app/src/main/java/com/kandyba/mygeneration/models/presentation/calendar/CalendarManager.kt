@@ -15,6 +15,8 @@ import com.kizitonwose.calendarview.model.InDateStyle
 import com.kizitonwose.calendarview.ui.MonthScrollListener
 import com.kizitonwose.calendarview.utils.next
 import com.kizitonwose.calendarview.utils.yearMonth
+import io.reactivex.Observable
+import rx.subjects.BehaviorSubject
 import java.time.YearMonth
 import java.time.temporal.WeekFields
 import java.util.*

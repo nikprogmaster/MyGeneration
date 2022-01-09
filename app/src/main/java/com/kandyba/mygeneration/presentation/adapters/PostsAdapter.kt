@@ -56,7 +56,7 @@ class PostsAdapter(private val postsList: List<PostModel>) :
             imagesAdapter?.let { photosGallery.setSliderAdapter(imagesAdapter) }
         }
 
-        fun getImageUrls(attachments: List<Attachment>): List<String> {
+        private fun getImageUrls(attachments: List<Attachment>): List<String> {
             return mutableListOf<String>().apply {
                 for (at in attachments) {
                     if (at.type == VIDEO_CONST) {
@@ -73,14 +73,13 @@ class PostsAdapter(private val postsList: List<PostModel>) :
                         }
                     }
                 }
-            }
+            }.toList()
         }
     }
 
     companion object {
         private const val VIDEO_CONST = "video"
         private const val PHOTO_CONST = "photo"
-        private const val SPAN_COUNT = 2
         private const val VIDEO_FRAME_REQUIRED_WIDTH = 800
         private const val PHOTO_REQUIRED_TYPE = "r"
     }

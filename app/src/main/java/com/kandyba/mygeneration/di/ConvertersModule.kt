@@ -8,6 +8,5 @@ import dagger.Provides
 class ConvertersModule {
 
     @Provides
-    fun provideUserConverter() =
-        UserConverter()
+    fun provideUserConverter() = UserConverter()
 }

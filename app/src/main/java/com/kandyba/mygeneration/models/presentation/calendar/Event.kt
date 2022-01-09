@@ -19,8 +19,7 @@ data class Event(
         parcel.readString(),
         parcel.readString(),
         parcel.readString()
-    ) {
-    }
+    )
 
     constructor(): this(null, null, null, null, null, null)
 

@@ -16,7 +16,7 @@ import com.kizitonwose.calendarview.ui.DayBinder
 import java.util.*
 
 class CalendarDayBinder(
-    private val eventsMap: HashMap<Calendar, List<Event>>,
+    private val eventsMap: HashMap<Calendar, MutableList<Event>>,
     private var context: Context?,
     private val action: (List<Event>) -> Unit
 ) : DayBinder<DayViewContainer> {
@@ -41,7 +41,7 @@ class CalendarDayBinder(
         }
         container.view.setOnClickListener {
             if (eventsMap.containsKey(date)) {
-                action.invoke(eventsMap.getOrDefault(date, listOf()))
+                action.invoke(eventsMap.getOrDefault(date, mutableListOf()))
             }
         }
     }

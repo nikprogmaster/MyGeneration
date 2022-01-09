@@ -32,7 +32,6 @@ class AnimationHelper {
             override fun onAnimationEnd(animation: Animator) {
                 animationListener.onAnimationEnd()
             }
-
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })

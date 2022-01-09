@@ -12,13 +12,19 @@ import com.kandyba.mygeneration.presentation.viewmodel.factories.MainFragmentVie
 import com.kandyba.mygeneration.presentation.viewmodel.factories.ProfileViewModelFactory
 import dagger.Module
 import dagger.Provides
+import io.reactivex.subjects.ReplaySubject
+import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
 class ViewModelModule {
 
     @Provides
-    fun provideAppViewModelFactory(): AppViewModelFactory {
-        return AppViewModelFactory { AppViewModel() }
+    fun provideAppViewModelFactory(
+        @Named("EventsSubject") eventsSubject: ReplaySubject<Unit>,
+        @Named("VkPostsSubject") vkPostsSubject: ReplaySubject<Unit>
+    ): AppViewModelFactory {
+        return AppViewModelFactory { AppViewModel(vkPostsSubject, eventsSubject) }
     }
 
     @Provides
@@ -27,13 +33,34 @@ class ViewModelModule {
     }
 
     @Provides
-    fun provideMainFragmentViewModelFactory(apiMapper: WallApiMapper): MainFragmentViewModelFactory {
+    @Named("EventsSubject")
+    fun provideEventsSubject(): ReplaySubject<Unit> {
+        return eventsSubject
+    }
+
+    @Provides
+    @Named("VkPostsSubject")
+    fun provideVkPostsSubject(): ReplaySubject<Unit> {
+        return vkPostsSubject
+    }
+
+    @Provides
+    fun provideMainFragmentViewModelFactory(
+        apiMapper: WallApiMapper,
+        @Named("EventsSubject") eventsSubject: ReplaySubject<Unit>,
+        @Named("VkPostsSubject") vkPostsSubject: ReplaySubject<Unit>
+    ): MainFragmentViewModelFactory {
         return MainFragmentViewModelFactory {
             MainFragmentViewModel(
-                WallInteractorImpl(
-                    WallRepositoryImpl(apiMapper)
-                )
+                WallInteractorImpl(WallRepositoryImpl(apiMapper)),
+                eventsSubject,
+                vkPostsSubject
             )
         }
+    }
+
+    companion object {
+        private val eventsSubject: ReplaySubject<Unit> = ReplaySubject.create()
+        private val vkPostsSubject: ReplaySubject<Unit> = ReplaySubject.create()
     }
 }

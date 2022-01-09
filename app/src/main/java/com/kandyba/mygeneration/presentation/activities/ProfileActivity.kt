@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -17,9 +16,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.textfield.TextInputEditText
@@ -114,7 +110,7 @@ class ProfileActivity : AppCompatActivity() {
                 .show()
             saveButton.visibility = View.VISIBLE
             fieldsValues = mapOf(
-                Pair(UserField.FIO, fio.text.toString()),
+                Pair(UserField.NAME, fio.text.toString()),
                 Pair(UserField.ACCOUNT_TYPE, accountType.text.toString()),
                 Pair(UserField.BIRTHDAY, birthday.text.toString()),
                 Pair(UserField.CITY, city.text.toString()),
@@ -160,8 +156,8 @@ class ProfileActivity : AppCompatActivity() {
         })
         viewModel.signInUserLiveData.observe(this, Observer { createSignInIntent() })
         viewModel.userInfoLiveData.observe(this, Observer { user -> setFields(user) })
-        viewModel.sharedPreferencesUserInfoLiveData.observe(this, Observer { user ->
-            updateSettings(user)
+        viewModel.sharedPreferencesUserInfoLiveData.observe(this, Observer { fields ->
+            updateSettings(fields)
         })
         viewModel.showReservedUserInfoLiveData.observe(this, Observer { setReservedFields() })
         viewModel.showProgressBarLiveData.observe(this, Observer { show ->
@@ -267,10 +263,10 @@ class ProfileActivity : AppCompatActivity() {
         )
     }
 
-    private fun checkIfFieldsWereChanged(): MutableMap<UserField, String> {
+    private fun checkIfFieldsWereChanged(): Map<UserField, String> {
         val changedFieldsList = mutableMapOf<UserField, String>()
-        if (fio.text.toString() != fieldsValues[UserField.FIO]) {
-            changedFieldsList[UserField.FIO] = fio.text.toString()
+        if (fio.text.toString() != fieldsValues[UserField.NAME]) {
+            changedFieldsList[UserField.NAME] = fio.text.toString()
         }
         if (login.text.toString() != fieldsValues[UserField.EMAIL]) {
             changedFieldsList[UserField.EMAIL] = login.text.toString()
@@ -287,7 +283,7 @@ class ProfileActivity : AppCompatActivity() {
         if (phone.text.toString() != fieldsValues[UserField.PHONE]) {
             changedFieldsList[UserField.PHONE] = phone.text.toString()
         }
-        return changedFieldsList
+        return changedFieldsList.toMap()
     }
 
     private fun makeFocusable(flag: Boolean) {
@@ -297,53 +293,19 @@ class ProfileActivity : AppCompatActivity() {
         birthday.isEnabled = flag
         city.isEnabled = flag
         if (flag) {
-            when (settings.getString(USER_AUTH_TYPE_KEY, EMPTY_STRING) ?: EMPTY_STRING) {
+            when (settings.getString(UserField.AUTH_TYPE.preferencesKey, EMPTY_STRING) ?: EMPTY_STRING) {
                 AuthType.GOOGLE.title, AuthType.EMAIL.title -> login.isEnabled = false
                 AuthType.PHONE.title -> phone.isEnabled = false
             }
         }
     }
 
-    private fun updateSettings(user: User) {
+    private fun updateSettings(fields: Map<UserField, String?>) {
         val editor = settings.edit()
-
-        if (!settings.getString(USER_ID_KEY, EMPTY_STRING).equals(user.id) && user.id != null) {
-            editor.putString(USER_ID_KEY, user.id)
-        }
-        if (!settings.getString(USER_NAME_KEY, EMPTY_STRING)
-                .equals(user.name) && user.name != null
-        ) {
-            editor.putString(USER_NAME_KEY, user.name)
-        }
-        if (!settings.getString(USER_ACCOUNT_TYPE_KEY, EMPTY_STRING).equals(user.accountType)
-            && user.accountType != null
-        ) {
-            editor.putString(USER_ACCOUNT_TYPE_KEY, user.accountType)
-        }
-        if (!settings.getString(USER_BIRTHDAY_KEY, EMPTY_STRING).equals(user.birthday)
-            && user.birthday != null
-        ) {
-            editor.putString(USER_BIRTHDAY_KEY, user.birthday)
-        }
-        if (!settings.getString(USER_LOGIN_KEY, EMPTY_STRING).equals(user.email)
-            && user.email != null
-        ) {
-            editor.putString(USER_LOGIN_KEY, user.email)
-        }
-        if (!settings.getString(USER_CITY_KEY, EMPTY_STRING).equals(user.city)
-            && user.city != null
-        ) {
-            editor.putString(USER_CITY_KEY, user.city)
-        }
-        if (!settings.getString(USER_PHONE_NUMBER_KEY, EMPTY_STRING).equals(user.phoneNumber)
-            && user.phoneNumber != null
-        ) {
-            editor.putString(USER_PHONE_NUMBER_KEY, user.phoneNumber)
-        }
-        if (!settings.getString(USER_AUTH_TYPE_KEY, EMPTY_STRING).equals(user.authType)
-            && user.authType != null
-        ) {
-            editor.putString(USER_AUTH_TYPE_KEY, user.authType)
+        for (key in fields.keys) {
+            if (settings.getString(key.preferencesKey, EMPTY_STRING) != fields[key]) {
+                editor.putString(key.preferencesKey, fields[key])
+            }
         }
         editor.apply()
     }
@@ -368,15 +330,15 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setReservedFields() {
-        if (settings.getString(USER_NAME_KEY, EMPTY_STRING) != EMPTY_STRING) {
+        if (settings.getString(UserField.NAME.preferencesKey, EMPTY_STRING) != EMPTY_STRING) {
             fioLayout.isHintEnabled = false
         }
-        fio.setText(settings.getString(USER_NAME_KEY, EMPTY_STRING))
-        login.setText(settings.getString(USER_LOGIN_KEY, EMPTY_STRING))
-        phone.setText(settings.getString(USER_PHONE_NUMBER_KEY, EMPTY_STRING))
-        birthday.setText(settings.getString(USER_BIRTHDAY_KEY, EMPTY_STRING))
-        city.setText(settings.getString(USER_CITY_KEY, EMPTY_STRING))
-        accountType.setText(settings.getString(USER_ACCOUNT_TYPE_KEY, EMPTY_STRING))
+        fio.setText(settings.getString(UserField.NAME.preferencesKey, EMPTY_STRING))
+        login.setText(settings.getString(UserField.EMAIL.preferencesKey, EMPTY_STRING))
+        phone.setText(settings.getString(UserField.PHONE.preferencesKey, EMPTY_STRING))
+        birthday.setText(settings.getString(UserField.BIRTHDAY.preferencesKey, EMPTY_STRING))
+        city.setText(settings.getString(UserField.CITY.preferencesKey, EMPTY_STRING))
+        accountType.setText(settings.getString(UserField.ACCOUNT_TYPE.preferencesKey, EMPTY_STRING))
     }
 
     private fun changeLayouts(flag: Boolean) {
@@ -390,16 +352,6 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     companion object {
-
         private const val RC_SIGN_IN = 123
-        private const val USER_ID_KEY = "id"
-        private const val USER_NAME_KEY = "name"
-        private const val USER_AUTH_TYPE_KEY = "authType"
-        private const val USER_LOGIN_KEY = "login"
-        private const val USER_PASSWORD_KEY = "password"
-        private const val USER_PHONE_NUMBER_KEY = "phone_number"
-        private const val USER_BIRTHDAY_KEY = "birthday"
-        private const val USER_ACCOUNT_TYPE_KEY = "accountType"
-        private const val USER_CITY_KEY = "city"
     }
 }

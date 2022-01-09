@@ -35,8 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/arrow_drop_down"
-            android:layout_gravity="bottom"
-            />
+            android:layout_gravity="bottom" />
 
     </LinearLayout>
 
@@ -46,10 +45,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/xxsmall"
+        android:layout_marginStart="@dimen/medium"
+        android:layout_marginEnd="@dimen/medium"
         app:layout_constraintTop_toBottomOf="@+id/title_layout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.kizitonwose.calendarview.CalendarView
         android:id="@+id/calendar_view"
@@ -60,6 +60,8 @@
         app:cv_orientation="horizontal"
         app:cv_outDateStyle="endOfRow"
         app:cv_dayViewResource="@layout/calendar_day_layout"
+        android:layout_marginStart="@dimen/medium"
+        android:layout_marginEnd="@dimen/medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/legend" />

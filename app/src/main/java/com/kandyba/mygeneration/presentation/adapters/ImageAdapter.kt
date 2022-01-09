@@ -10,7 +10,7 @@ import com.smarteist.autoimageslider.SliderViewAdapter
 import com.squareup.picasso.Picasso
 
 
-class ImageAdapter(val imageURLs: List<String>) :
+class ImageAdapter(private val imageURLs: List<String>) :
     SliderViewAdapter<ImageAdapter.ImageViewHolder>() {
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {

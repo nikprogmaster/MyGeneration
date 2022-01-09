@@ -39,19 +39,19 @@ fun parseDateFromString(date: String): Calendar {
     }
 }
 
-fun addEventsToMap(events: List<Event>): HashMap<Calendar, List<Event>> {
-    val map = HashMap<Calendar, List<Event>>()
+fun addEventsToMap(events: List<Event>): HashMap<Calendar, MutableList<Event>> {
+    val map = HashMap<Calendar, MutableList<Event>>()
     for (event in events) {
         event.startDay?.let {
             val cal = parseDateFromString(event.startDay)
             if (map.containsKey(cal)) {
-                map[cal]?.toMutableList()?.add(event)
+                map[cal]?.add(event)
             } else {
                 map[cal] = mutableListOf(event)
             }
         }
     }
-    return map.also { m -> m.map { it.value.toList() } }
+    return map
 }
 
 fun parseDateFromCalendarDay(day: CalendarDay): Calendar {

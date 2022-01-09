@@ -1,6 +1,5 @@
 package com.kandyba.mygeneration.models.data
 
-import android.content.ClipData.Item
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -11,7 +10,7 @@ data class WallResponse(
     var response: Response
 )
 
-data class Response (
+data class Response(
     @SerializedName("count")
     @Expose
     var count: Int? = null,
