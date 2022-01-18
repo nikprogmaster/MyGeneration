@@ -3,6 +3,7 @@ package com.kandyba.mygeneration.di
 import android.content.Context
 import com.kandyba.mygeneration.presentation.activities.MainActivity
 import com.kandyba.mygeneration.presentation.activities.ProfileActivity
+import com.kandyba.mygeneration.presentation.fragments.BottomCalendarDialogFragment
 import com.kandyba.mygeneration.presentation.fragments.MainFragment
 import dagger.BindsInstance
 import dagger.Component
@@ -23,6 +24,8 @@ interface AppComponent {
     fun injectProfileActivity(profileActivity: ProfileActivity)
 
     fun injectMainFragment(mainFragment: MainFragment)
+
+    fun injectBottomCalendarFragment(calendarDialogFragment: BottomCalendarDialogFragment)
 
     @Component.Factory
     interface Factory {

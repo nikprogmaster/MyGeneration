@@ -1,7 +1,7 @@
-
 package com.kandyba.mygeneration.presentation.viewmodel
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,11 +11,15 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.data.AccountType
 import com.kandyba.mygeneration.models.data.User
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
+import java.io.File
+import java.io.FileInputStream
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(
@@ -28,39 +32,51 @@ class ProfileViewModel @Inject constructor(
     private val sharedPreferencesUserInfo = MutableLiveData<Map<UserField, String?>>()
     private val showReservedUserInfo = MutableLiveData<Unit>()
     private val showProgressBar = MutableLiveData<Boolean>()
-    private val clearSharedPreferences = MutableLiveData<Unit>()
 
     private lateinit var auth: FirebaseAuth
     private lateinit var settings: SharedPreferences
 
+    /** [LiveData] для отображения layout залогиненного пользователя */
     val showLoggedUserLayoutLiveData: LiveData<Boolean>
         get() = showLoggedUserLayout
+
+    /** [LiveData] для получения информации о пользователе */
     val userInfoLiveData: LiveData<User>
         get() = userInfo
+
+    /** [LiveData] о том, что пользователь залогинился */
     val signInUserLiveData: LiveData<Unit>
         get() = signInUser
+
+    /** [LiveData] для записи информации в shared preferences */
     val sharedPreferencesUserInfoLiveData: LiveData<Map<UserField, String?>>
         get() = sharedPreferencesUserInfo
+
+    /** [LiveData] для показа сохраненной информации о пользователе */
     val showReservedUserInfoLiveData: LiveData<Unit>
         get() = showReservedUserInfo
+
+    /** [LiveData] для отображения загрузки */
     val showProgressBarLiveData: LiveData<Boolean>
         get() = showProgressBar
-    val clearSharedPreferencesLiveData: LiveData<Unit>
-        get() = clearSharedPreferences
 
     fun init(prefs: SharedPreferences) {
         auth = FirebaseAuth.getInstance()
         settings = prefs
+        if (settings.getString(UserField.ID.preferencesKey, null) == null
+            || auth.currentUser == null
+        ) {
+            showLoggedUserLayout.value = false
+        } else {
+            showReservedUserInfo.value = Unit
+            decideIfUserIsAlive()
+        }
+    }
 
+    private fun decideIfUserIsAlive() {
         auth.currentUser?.reload()?.addOnCompleteListener {
-            val user = auth.currentUser
-            if (user == null) {
+            if (auth.currentUser == null) {
                 showLoggedUserLayout.value = false
-                clearSharedPreferences.value = Unit
-                deleteUserFromDatabase()
-            } else {
-                showReservedUserInfo.value = Unit
-                showLoggedUserLayout.value = true
             }
         }
     }
@@ -142,6 +158,23 @@ class ProfileViewModel @Inject constructor(
     fun signInUser() {
         signInUser.value = Unit
         showProgressBar.value = true
+    }
+
+    fun uploadUserAvatar(file: File?, id: String?) {
+        Log.i("File path", file?.absolutePath.toString())
+        Log.i("File path can", file?.canonicalPath.toString())
+        val stream = FileInputStream(file?.absoluteFile)
+        val storage = Firebase.storage
+
+        id?.let {
+            val avatarRef = storage.reference.child("avatars/${it}.jpg")
+            val uploadTask = avatarRef.putStream(stream)
+            uploadTask.addOnFailureListener {
+                Log.i("Avatar", "Error")
+            }.addOnSuccessListener { taskSnapshot ->
+                Log.i("Avatar", "Success")
+            }
+        }
     }
 
     companion object {

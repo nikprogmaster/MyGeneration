@@ -35,8 +35,8 @@ class MainFragment : Fragment() {
     private lateinit var postsRecyclerView: RecyclerView
 
     private lateinit var viewModel: MainFragmentViewModel
-    private lateinit var postsAdapter: PostsAdapter
     private lateinit var calendarDayBinder: CalendarDayBinder
+    private var postsAdapter: PostsAdapter? = null
 
 
     @Inject
@@ -66,7 +66,7 @@ class MainFragment : Fragment() {
         initObservers()
 
         viewModel.loadEvents()
-        viewModel.loadVkPosts(10)
+        viewModel.loadVkPosts(false)
     }
 
     private fun initObservers() {
@@ -79,8 +79,8 @@ class MainFragment : Fragment() {
         })
         viewModel.vkPostsLiveData.observe(requireActivity(), Observer { resp ->
             resp.response.items?.let {
-                postsAdapter = PostsAdapter(it)
-                postsRecyclerView.adapter = postsAdapter
+                    postsAdapter = PostsAdapter(it)
+                    postsRecyclerView.adapter = postsAdapter
             }
         })
     }

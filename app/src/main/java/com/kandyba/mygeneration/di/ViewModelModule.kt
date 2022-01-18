@@ -4,9 +4,7 @@ import com.kandyba.mygeneration.data.WallApiMapper
 import com.kandyba.mygeneration.data.repository.WallRepositoryImpl
 import com.kandyba.mygeneration.domain.WallInteractorImpl
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
-import com.kandyba.mygeneration.presentation.viewmodel.AppViewModel
-import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
-import com.kandyba.mygeneration.presentation.viewmodel.ProfileViewModel
+import com.kandyba.mygeneration.presentation.viewmodel.*
 import com.kandyba.mygeneration.presentation.viewmodel.factories.AppViewModelFactory
 import com.kandyba.mygeneration.presentation.viewmodel.factories.MainFragmentViewModelFactory
 import com.kandyba.mygeneration.presentation.viewmodel.factories.ProfileViewModelFactory
@@ -56,6 +54,14 @@ class ViewModelModule {
                 eventsSubject,
                 vkPostsSubject
             )
+        }
+    }
+
+    @Provides
+    //@Named("CalendarDialogViewModel")
+    fun provideCalendarDialogViewModelFactory(): ViewModelFactory {
+        return ViewModelFactory {
+            CalendarDialogViewModel()
         }
     }
 

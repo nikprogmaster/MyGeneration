@@ -14,6 +14,7 @@ import com.kandyba.mygeneration.models.presentation.calendar.Event
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
+import java.util.concurrent.TimeUnit
 
 class MainFragmentViewModel(
     private val wallInteractor: WallInteractor,
@@ -24,6 +25,7 @@ class MainFragmentViewModel(
     private val getEvents = MutableLiveData<List<Event>>()
     private val openBottomCalendarFragment = SingleLiveEvent<List<Event>>()
     private val vkPosts = MutableLiveData<WallResponse>()
+    private var postCount = INITIAL_POSTS_COUNT
 
     val getEventsLiveData: LiveData<List<Event>>
         get() = getEvents
@@ -53,7 +55,8 @@ class MainFragmentViewModel(
         })
     }
 
-    fun loadVkPosts(postCount: Int) {
+    fun loadVkPosts(double: Boolean) {
+        if (double) postCount *= 2
         wallInteractor.getWallPosts(postCount)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -77,5 +80,6 @@ class MainFragmentViewModel(
 
     companion object {
         private const val CALENDAR_DATABASE_ENDPOINT = "calendar"
+        private const val INITIAL_POSTS_COUNT = 100
     }
 }

@@ -6,48 +6,74 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.core.view.marginTop
 import androidx.core.view.size
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
+import com.google.android.material.snackbar.Snackbar
+import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.presentation.adapters.EventAdapter
+import com.kandyba.mygeneration.presentation.viewmodel.CalendarDialogViewModel
+import com.kandyba.mygeneration.presentation.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.bottom_calendar_fragment.*
+import javax.inject.Inject
 
 
 class BottomCalendarDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var eventsRecyclerView: RecyclerView
     private lateinit var eventsAdapter: EventAdapter
+    private lateinit var addEventButton: FloatingActionButton
+    private lateinit var rootView: View
 
     private var eventsList: ArrayList<Event> = ArrayList()
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private lateinit var viewModel: CalendarDialogViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.bottom_calendar_fragment, container, false)
-        eventsRecyclerView = root.findViewById(R.id.events_list)
+        rootView = inflater.inflate(R.layout.bottom_calendar_fragment, container, false)
+        addEventButton = rootView.findViewById(R.id.add_event)
+        addEventButton.setOnClickListener { viewModel.addNewEvent("NewEvent") }
+        eventsRecyclerView = rootView.findViewById(R.id.events_list)
         eventsList = arguments?.getParcelableArrayList<Event>(EVENT_LIST) as ArrayList<Event>
         eventsAdapter = EventAdapter(eventsList)
         eventsRecyclerView.adapter = eventsAdapter
 
         dialog?.setOnShowListener {
-            val bottomSheetBehavior = BottomSheetBehavior.from(root.parent as View)
+            val bottomSheetBehavior = BottomSheetBehavior.from(rootView.parent as View)
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            val div = root.findViewById<ImageView>(R.id.stick)
+            val div = rootView.findViewById<ImageView>(R.id.stick)
             bottomSheetBehavior.peekHeight = eventsRecyclerView[0].height + div.height
         }
-        return root
+        return rootView
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        (requireActivity().application as App).appComponent.injectBottomCalendarFragment(this)
+        viewModel = ViewModelProvider(this, viewModelFactory)[CalendarDialogViewModel::class.java]
+        viewModel.addNewEvent.observe(viewLifecycleOwner, Observer { Toast.makeText(requireContext(), "Ну привет, дорогой", Toast.LENGTH_LONG).show() })
     }
 
     private fun solveNotRoundedCornersProblem() {

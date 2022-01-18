@@ -1,10 +1,13 @@
 package com.kandyba.mygeneration.presentation.activities
 
-import  android.app.Activity
+
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -26,12 +29,14 @@ import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.data.AuthType
 import com.kandyba.mygeneration.models.data.User
+import com.kandyba.mygeneration.models.presentation.FileUtils
 import com.kandyba.mygeneration.models.presentation.user.UserField
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.animation.ProfileAnimation
 import com.kandyba.mygeneration.presentation.animation.show
 import com.kandyba.mygeneration.presentation.viewmodel.ProfileViewModel
 import com.kandyba.mygeneration.presentation.viewmodel.factories.ProfileViewModelFactory
+import java.io.File
 import javax.inject.Inject
 
 class ProfileActivity : AppCompatActivity() {
@@ -144,6 +149,15 @@ class ProfileActivity : AppCompatActivity() {
             showProgressBar(true)
             signOut()
         }
+        avatar.setOnClickListener {
+            val intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_PICK
+            startActivityForResult(
+                Intent.createChooser(intent, "Select Picture"),
+                PICK_IMAGE_AVATAR
+            )
+        }
     }
 
     private fun showProgressBar(show: Boolean) {
@@ -152,7 +166,7 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun initObservers() {
         viewModel.showLoggedUserLayoutLiveData.observe(this, Observer { show ->
-            changeLayouts(show)
+            showLoggedUserLayout(show)
         })
         viewModel.signInUserLiveData.observe(this, Observer { createSignInIntent() })
         viewModel.userInfoLiveData.observe(this, Observer { user -> setFields(user) })
@@ -162,9 +176,6 @@ class ProfileActivity : AppCompatActivity() {
         viewModel.showReservedUserInfoLiveData.observe(this, Observer { setReservedFields() })
         viewModel.showProgressBarLiveData.observe(this, Observer { show ->
             showProgressBar(show)
-        })
-        viewModel.clearSharedPreferencesLiveData.observe(this, Observer {
-            clearSharedPreferences()
         })
     }
 
@@ -195,8 +206,6 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == RC_SIGN_IN) {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
@@ -214,6 +223,15 @@ class ProfileActivity : AppCompatActivity() {
                 // ...
             }
         }
+        if (requestCode == PICK_IMAGE_AVATAR) {
+            val selectedImage: Uri? = data?.data
+            avatar.setImageURI(selectedImage)
+
+            val file = FileUtils.getPath(this, selectedImage)
+            Log.i("selectedImage", data?.dataString.toString())
+            //viewModel.uploadUserAvatar(File(file), settings.getString(UserField.ID.preferencesKey, null))
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun signOut() {
@@ -221,7 +239,7 @@ class ProfileActivity : AppCompatActivity() {
             .signOut(this)
             .addOnCompleteListener {
                 showProgressBar(false)
-                changeLayouts(false)
+                showLoggedUserLayout(false)
                 clearSharedPreferences()
             }
     }
@@ -341,17 +359,19 @@ class ProfileActivity : AppCompatActivity() {
         accountType.setText(settings.getString(UserField.ACCOUNT_TYPE.preferencesKey, EMPTY_STRING))
     }
 
-    private fun changeLayouts(flag: Boolean) {
+    private fun showLoggedUserLayout(flag: Boolean) {
         if (flag) {
             logged.visibility = View.VISIBLE
             unloggedUserLayout.visibility = View.GONE
         } else {
             logged.visibility = View.GONE
             unloggedUserLayout.visibility = View.VISIBLE
+            clearSharedPreferences()
         }
     }
 
     companion object {
         private const val RC_SIGN_IN = 123
+        private const val PICK_IMAGE_AVATAR = 1
     }
 }

@@ -2,6 +2,7 @@ package com.kandyba.mygeneration.presentation.activities
 
 import android.animation.Animator
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -17,12 +18,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import com.kandyba.mygeneration.presentation.fragments.MainFragment
 import com.kandyba.mygeneration.presentation.animation.AnimationHelper
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.fragments.BottomCalendarDialogFragment
+import com.kandyba.mygeneration.presentation.fragments.MainFragment
 import com.kandyba.mygeneration.presentation.viewmodel.AppViewModel
-import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
 import com.kandyba.mygeneration.presentation.viewmodel.factories.AppViewModelFactory
 import javax.inject.Inject
 
@@ -45,6 +45,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: AppViewModelFactory
+
+    @Inject
+    lateinit var settings: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
