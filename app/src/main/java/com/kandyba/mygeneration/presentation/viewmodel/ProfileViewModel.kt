@@ -8,8 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import com.kandyba.mygeneration.data.repository.RegionsRepository
 import com.kandyba.mygeneration.data.repository.UserRepository
 import com.kandyba.mygeneration.models.EMPTY_STRING
+import com.kandyba.mygeneration.models.data.RegionModel
 import com.kandyba.mygeneration.models.presentation.user.User
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
@@ -20,7 +22,8 @@ import java.io.File
 
 class ProfileViewModel(
     private val userConverter: UserConverter,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val regionsRepository: RegionsRepository
 ) : BaseViewModel() {
 
     private val showLoggedUserLayout = MutableLiveData<Boolean>()
@@ -29,6 +32,7 @@ class ProfileViewModel(
     private val sharedPreferencesUserInfo = MutableLiveData<Map<UserField, String?>>()
     private val showReservedUserInfo = MutableLiveData<Unit>()
     private val showProgressBar = MutableLiveData<Boolean>()
+    private val regions = MutableLiveData<List<RegionModel>>()
 
     private lateinit var auth: FirebaseAuth
     private lateinit var settings: SharedPreferences
@@ -58,7 +62,11 @@ class ProfileViewModel(
     val showProgressBarLiveData: LiveData<Boolean>
         get() = showProgressBar
 
+    val regionsLiveData: LiveData<List<RegionModel>>
+        get() = regions
+
     fun init(prefs: SharedPreferences) {
+        loadRegions()
         auth = FirebaseAuth.getInstance()
         settings = prefs
         if (settings.getString(UserField.ID.preferencesKey, null) == null
@@ -68,6 +76,16 @@ class ProfileViewModel(
         } else {
             showReservedUserInfo.value = Unit
             decideIfUserIsAlive()
+        }
+    }
+
+    private fun loadRegions() {
+        viewModelScope.launch {
+            try {
+                regions.postValue(regionsRepository.getRegions())
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
         }
     }
 
@@ -127,10 +145,9 @@ class ProfileViewModel(
         }
     }
 
-
     private fun deleteUserFromDatabase() {
         val databaseReference = FirebaseDatabase.getInstance().reference
-        val ref = databaseReference.child(USER_DATABASE_ENDPOINT).child(
+        val ref = databaseReference.child("").child(
             settings.getString(UserField.ID.preferencesKey, EMPTY_STRING) ?: EMPTY_STRING
         )
         ref.removeValue()
@@ -138,6 +155,5 @@ class ProfileViewModel(
 
     companion object {
         private const val TAG = "ProfileViewModel"
-        private const val USER_DATABASE_ENDPOINT = "users"
     }
 }

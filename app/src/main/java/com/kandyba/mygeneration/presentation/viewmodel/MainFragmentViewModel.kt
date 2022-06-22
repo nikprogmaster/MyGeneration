@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.kandyba.mygeneration.data.repository.EventsRepository
+import com.kandyba.mygeneration.data.repository.RegionsRepository
 import com.kandyba.mygeneration.data.repository.WallRepository
 import com.kandyba.mygeneration.models.presentation.SingleLiveEvent
 import com.kandyba.mygeneration.models.presentation.VkPost
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.first
 
 class MainFragmentViewModel(
     private val wallRepository: WallRepository,
-    private val eventsRepository: EventsRepository
+    private val eventsRepository: EventsRepository,
+    private val regionsRepository: RegionsRepository
 ) : BaseViewModel() {
 
     private var postCount = INITIAL_POSTS_COUNT
@@ -43,8 +45,10 @@ class MainFragmentViewModel(
         viewModelScope.launch {
             val eventsLoaded = async { loadEvents() }
             val vkPostsLoaded = async { loadVkPosts(false) }
+            val regionsLoaded = async { loadRegions() }
             eventsLoaded.await()
             vkPostsLoaded.await()
+            regionsLoaded.await()
             _allDataLoaded.postValue(Unit)
         }
     }
@@ -73,6 +77,10 @@ class MainFragmentViewModel(
 
         // При запуске с помощью async{} исключения появляются только при вызове метода await()
         // scope.async {  }
+    }
+
+    private suspend fun loadRegions() {
+        regionsRepository.getRegions()
     }
 
     fun openBottomCalendarFragment(event: List<Event>) {

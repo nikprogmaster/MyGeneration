@@ -32,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.EMPTY_STRING
+import com.kandyba.mygeneration.models.data.RegionModel
 import com.kandyba.mygeneration.models.presentation.FileUtils
 import com.kandyba.mygeneration.models.presentation.user.AuthType
 import com.kandyba.mygeneration.models.presentation.user.User
@@ -211,14 +212,14 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
         setTextWatchers()
-        setMenuToRegion()
     }
 
-    private fun setMenuToRegion() {
+    private fun setMenuToRegion(regions: List<RegionModel>) {
         regionMenu = PopupMenu(this, region)
         regionMenu?.let {
-            it.menu.add("Москва")
-            it.menu.add("Санкт-Петербург")
+            for (r in regions) {
+                it.menu.add(r.name)
+            }
             it.setOnMenuItemClickListener { item ->
                 region.setText(item.title)
                 true
@@ -269,6 +270,7 @@ class ProfileActivity : AppCompatActivity() {
         }
         viewModel.showReservedUserInfoLiveData.observe(this) { setReservedFields() }
         viewModel.showProgressBarLiveData.observe(this) { show -> showProgressBar(show) }
+        viewModel.regionsLiveData.observe(this) { setMenuToRegion(it) }
     }
 
     private fun createSignInIntent() {

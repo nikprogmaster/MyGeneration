@@ -1,9 +1,11 @@
 package com.kandyba.mygeneration.di
 
 import com.kandyba.mygeneration.data.EventsDatadaseSource
+import com.kandyba.mygeneration.data.RegionFirestoreSource
 import com.kandyba.mygeneration.data.UserDatabaseSource
 import com.kandyba.mygeneration.data.WallApiMapper
 import com.kandyba.mygeneration.data.repository.EventsRepositoryImpl
+import com.kandyba.mygeneration.data.repository.RegionsRepositoryImpl
 import com.kandyba.mygeneration.data.repository.UserRepositoryImpl
 import com.kandyba.mygeneration.data.repository.WallRepositoryImpl
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
@@ -23,7 +25,8 @@ class ViewModelModule {
         ViewModelFactory {
             ProfileViewModel(
                 userConverter,
-                UserRepositoryImpl(UserDatabaseSource())
+                UserRepositoryImpl(UserDatabaseSource()),
+                RegionsRepositoryImpl(RegionFirestoreSource())
             )
         }
 
@@ -35,7 +38,8 @@ class ViewModelModule {
         ViewModelFactory {
             MainFragmentViewModel(
                 WallRepositoryImpl(apiMapper),
-                EventsRepositoryImpl(EventsDatadaseSource())
+                EventsRepositoryImpl(EventsDatadaseSource()),
+                RegionsRepositoryImpl(RegionFirestoreSource())
             )
         }
 
