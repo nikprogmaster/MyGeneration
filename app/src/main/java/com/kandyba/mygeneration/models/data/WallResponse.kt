@@ -1,21 +1,19 @@
 package com.kandyba.mygeneration.models.data
 
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class WallResponse(
-    @SerializedName("response")
-    @Expose
+    @SerialName("response")
     var response: Response
 )
 
+@Serializable
 data class Response(
-    @SerializedName("count")
-    @Expose
+    @SerialName("count")
     var count: Int? = null,
 
-    @SerializedName("items")
-    @Expose
+    @SerialName("items")
     var items: List<PostModel>? = null
 )

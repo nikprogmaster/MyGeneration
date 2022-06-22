@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "599814783317-22p7bmpm9tk2fke4priq8ut4n70mjivh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kandyba.mygeneration",
+            "certificate_hash": "15ed26c4eb494dc2305ad7e7c7edb9e5a69c0157"
+          }
+        },
+        {
           "client_id": "599814783317-84lsbeaupinvn2usm51pr2rmnq34tnoo.apps.googleusercontent.com",
           "client_type": 3
         }

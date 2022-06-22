@@ -4,7 +4,7 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.PhoneAuthProvider
 
-data class User(
+data class UserModel(
     val id: String? = null,
     val name: String? = null,
     val authType: String? = null,

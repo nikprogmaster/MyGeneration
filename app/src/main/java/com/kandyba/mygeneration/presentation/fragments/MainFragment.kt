@@ -21,9 +21,7 @@ import com.kandyba.mygeneration.presentation.activities.MainActivity
 import com.kandyba.mygeneration.presentation.adapters.PostsAdapter
 import com.kandyba.mygeneration.presentation.binder.CalendarDayBinder
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
-import com.kandyba.mygeneration.presentation.viewmodel.factories.MainFragmentViewModelFactory
 import com.kizitonwose.calendarview.CalendarView
-import javax.inject.Inject
 
 class MainFragment : Fragment() {
 
@@ -37,10 +35,6 @@ class MainFragment : Fragment() {
     private lateinit var viewModel: MainFragmentViewModel
     private lateinit var calendarDayBinder: CalendarDayBinder
     private var postsAdapter: PostsAdapter? = null
-
-
-    @Inject
-    lateinit var viewModelFactory: MainFragmentViewModelFactory
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,32 +52,28 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (requireActivity().application as App).appComponent.injectMainFragment(this)
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            viewModelFactory
-        )[MainFragmentViewModel::class.java]
+        val factory = (requireActivity().application as App).appComponent
+            .getMainFragmentViewModelFactory()
+        viewModel = ViewModelProvider(requireActivity(), factory)
+            .get(MainFragmentViewModel::class.java)
         initObservers()
-
-        viewModel.loadEvents()
-        viewModel.loadVkPosts(false)
+        viewModel.init()
     }
 
     private fun initObservers() {
-        viewModel.getEventsLiveData.observe(requireActivity(), Observer { events ->
+        viewModel.events.observe(requireActivity(), Observer { events ->
             setCalendarDayBinder(events)
             setCalendarManager()
         })
-        viewModel.openBottomCalendarFragmentLiveData.observe(requireActivity(), Observer { events ->
+        viewModel.openBottomEventSheet.observe(requireActivity(), Observer { events ->
             openBottomSheetFragment(events)
         })
-        viewModel.vkPostsLiveData.observe(requireActivity(), Observer { resp ->
-            resp.response.items?.let {
-                    postsAdapter = PostsAdapter(it)
-                    postsRecyclerView.adapter = postsAdapter
-            }
+        viewModel.vkPosts.observe(requireActivity(), Observer { posts ->
+            postsAdapter = PostsAdapter(posts)
+            postsRecyclerView.adapter = postsAdapter
         })
     }
+
     private fun openBottomSheetFragment(events: List<Event>) {
         val activity = requireActivity()
         if (activity is MainActivity) {

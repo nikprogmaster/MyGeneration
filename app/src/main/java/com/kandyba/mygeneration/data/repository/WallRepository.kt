@@ -1,9 +1,8 @@
 package com.kandyba.mygeneration.data.repository
 
-import com.kandyba.mygeneration.models.data.WallResponse
-import io.reactivex.Single
+import com.kandyba.mygeneration.models.presentation.VkPost
 
 interface WallRepository {
 
-    fun getWallPosts(postCount: Int): Single<WallResponse>
+    suspend fun getWallPosts(postCount: Int): List<VkPost>
 }

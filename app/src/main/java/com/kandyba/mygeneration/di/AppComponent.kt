@@ -1,10 +1,6 @@
 package com.kandyba.mygeneration.di
 
 import android.content.Context
-import com.kandyba.mygeneration.presentation.activities.MainActivity
-import com.kandyba.mygeneration.presentation.activities.ProfileActivity
-import com.kandyba.mygeneration.presentation.fragments.BottomCalendarDialogFragment
-import com.kandyba.mygeneration.presentation.fragments.MainFragment
 import dagger.BindsInstance
 import dagger.Component
 
@@ -17,20 +13,10 @@ import dagger.Component
         NetworkModule::class
     ]
 )
-interface AppComponent {
-
-    fun injectMainActivity(mainActivity: MainActivity)
-
-    fun injectProfileActivity(profileActivity: ProfileActivity)
-
-    fun injectMainFragment(mainFragment: MainFragment)
-
-    fun injectBottomCalendarFragment(calendarDialogFragment: BottomCalendarDialogFragment)
+interface AppComponent : AppApi {
 
     @Component.Factory
     interface Factory {
-        fun create(
-            @BindsInstance context: Context
-        ): AppComponent
+        fun create(@BindsInstance context: Context): AppComponent
     }
 }

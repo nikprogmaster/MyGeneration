@@ -3,82 +3,84 @@ package com.kandyba.mygeneration.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.kandyba.mygeneration.domain.WallInteractor
-import com.kandyba.mygeneration.models.data.WallResponse
+import androidx.lifecycle.viewModelScope
+import com.kandyba.mygeneration.data.repository.EventsRepository
+import com.kandyba.mygeneration.data.repository.WallRepository
 import com.kandyba.mygeneration.models.presentation.SingleLiveEvent
+import com.kandyba.mygeneration.models.presentation.VkPost
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.ReplaySubject
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 
 class MainFragmentViewModel(
-    private val wallInteractor: WallInteractor,
-    private val areEventsLoaded: ReplaySubject<Unit>,
-    private val areVkPostsLoaded: ReplaySubject<Unit>
+    private val wallRepository: WallRepository,
+    private val eventsRepository: EventsRepository
 ) : BaseViewModel() {
 
-    private val getEvents = MutableLiveData<List<Event>>()
-    private val openBottomCalendarFragment = SingleLiveEvent<List<Event>>()
-    private val vkPosts = MutableLiveData<WallResponse>()
     private var postCount = INITIAL_POSTS_COUNT
 
-    val getEventsLiveData: LiveData<List<Event>>
-        get() = getEvents
-    val openBottomCalendarFragmentLiveData: LiveData<List<Event>>
-        get() = openBottomCalendarFragment
-    val vkPostsLiveData: LiveData<WallResponse>
-        get() = vkPosts
+    private val _events = MutableLiveData<List<Event>>()
+    private val _openBottomEventSheet = SingleLiveEvent<List<Event>>()
+    private val _vkPosts = MutableLiveData<List<VkPost>>()
+    private val _allDataLoaded = MutableLiveData<Unit>()
 
-    fun loadEvents() {
-        val databaseReference = FirebaseDatabase.getInstance().reference
-        val ref = databaseReference.child(CALENDAR_DATABASE_ENDPOINT)
-        ref.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                areEventsLoaded.onNext(Unit)
-            }
+    val events: LiveData<List<Event>>
+        get() = _events
+    val openBottomEventSheet: LiveData<List<Event>>
+        get() = _openBottomEventSheet
+    val vkPosts: LiveData<List<VkPost>>
+        get() = _vkPosts
+    val allDataLoaded: LiveData<Unit>
+        get() = _allDataLoaded
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val eventList = mutableListOf<Event>()
-                for (i in snapshot.children) {
-                    val event = i.getValue(Event::class.java)
-                    if (event != null)
-                        eventList.add(event)
-                }
-                getEvents.value = eventList
-                areEventsLoaded.onNext(Unit)
-            }
-        })
+    // Use SupervisorJob instead of Job to get non-cancelable-parent coroutine
+    val scope =
+        CoroutineScope(Job() + Dispatchers.IO + Dispatchers.Main + CoroutineName("My coroutine"))
+
+    private val coroutineContext = SupervisorJob() + Dispatchers.IO
+
+    fun init() {
+        viewModelScope.launch {
+            val eventsLoaded = async { loadEvents() }
+            val vkPostsLoaded = async { loadVkPosts(false) }
+            eventsLoaded.await()
+            vkPostsLoaded.await()
+            _allDataLoaded.postValue(Unit)
+        }
     }
 
-    fun loadVkPosts(double: Boolean) {
+    private suspend fun loadEvents() {
+        val events = eventsRepository.getEvents(CALENDAR_DATABASE_ENDPOINT)
+            .first()
+        _events.postValue(events)
+    }
+
+    private suspend fun loadVkPosts(double: Boolean) {
         if (double) postCount *= 2
-        wallInteractor.getWallPosts(postCount)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doFinally { areVkPostsLoaded.onNext(Unit) }
-            .subscribe(
-                {
-                    Log.i("Posts", it.response.items.toString())
-                    vkPosts.postValue(it)
-                    areVkPostsLoaded.onNext(Unit)
-                },
-                {
-                    Log.e("VkError", it.message.toString())
-                    areVkPostsLoaded.onNext(Unit)
-                }
-            ).addTo(rxCompositeDisposable)
+
+        // coroutineScope {  }
+
+        // This scope have to handle errors by itself, otherwise the app will crash!
+        //supervisorScope {  }
+
+        // При запуске с помощью launch { } исключения появляются сразу
+        try {
+            val result = wallRepository.getWallPosts(postCount)
+            _vkPosts.postValue(result)
+        } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
+        }
+
+        // При запуске с помощью async{} исключения появляются только при вызове метода await()
+        // scope.async {  }
     }
 
     fun openBottomCalendarFragment(event: List<Event>) {
-        openBottomCalendarFragment.value = event
+        _openBottomEventSheet.value = event
     }
 
     companion object {
+        private const val TAG = "MainFragmentViewModel"
         private const val CALENDAR_DATABASE_ENDPOINT = "calendar"
         private const val INITIAL_POSTS_COUNT = 100
     }

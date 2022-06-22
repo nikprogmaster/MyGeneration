@@ -1,22 +1,21 @@
 package com.kandyba.mygeneration.models.presentation.user
 
-import android.icu.text.UFormat
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.PhoneAuthProvider
-import com.kandyba.mygeneration.models.data.User
+import com.kandyba.mygeneration.models.data.UserModel
 
 class UserConverter {
 
-    fun convert(firebaseUser: FirebaseUser): User {
+    fun convert(firebaseUser: FirebaseUser): UserModel {
         val authType =
             when (firebaseUser.providerId) {
                 GoogleAuthProvider.PROVIDER_ID -> GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD
                 PhoneAuthProvider.PROVIDER_ID -> PhoneAuthProvider.PHONE_SIGN_IN_METHOD
                 else -> EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
             }
-        return User(
+        return UserModel(
             firebaseUser.uid,
             firebaseUser.displayName,
             authType,
@@ -26,16 +25,16 @@ class UserConverter {
         )
     }
 
-    fun convertForSettings(user: User): Map<UserField, String?> {
+    fun convertForSettings(userModel: UserModel): Map<UserField, String?> {
         return mapOf(
-            UserField.NAME to user.name,
-            UserField.ID to user.id,
-            UserField.ACCOUNT_TYPE to user.accountType,
-            UserField.BIRTHDAY to user.birthday,
-            UserField.CITY to user.city,
-            UserField.EMAIL to user.email,
-            UserField.PHONE to user.phoneNumber,
-            UserField.AUTH_TYPE to user.authType
+            UserField.NAME to userModel.name,
+            UserField.ID to userModel.id,
+            UserField.ACCOUNT_TYPE to userModel.accountType,
+            UserField.BIRTHDAY to userModel.birthday,
+            UserField.CITY to userModel.city,
+            UserField.EMAIL to userModel.email,
+            UserField.PHONE to userModel.phoneNumber,
+            UserField.AUTH_TYPE to userModel.authType
         )
     }
 }

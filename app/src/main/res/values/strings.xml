@@ -26,4 +26,5 @@
     <string name="show_full">Показать полностью</string>
     <string name="roll_up">Свернуть</string>
     <string name="zero">0</string>
+    <string name="image_chooser_title">Выберите фото</string>
 </resources>

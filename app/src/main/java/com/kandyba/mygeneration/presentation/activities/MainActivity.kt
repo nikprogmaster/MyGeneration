@@ -2,7 +2,6 @@ package com.kandyba.mygeneration.presentation.activities
 
 import android.animation.Animator
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -23,8 +22,7 @@ import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.fragments.BottomCalendarDialogFragment
 import com.kandyba.mygeneration.presentation.fragments.MainFragment
 import com.kandyba.mygeneration.presentation.viewmodel.AppViewModel
-import com.kandyba.mygeneration.presentation.viewmodel.factories.AppViewModelFactory
-import javax.inject.Inject
+import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,35 +37,40 @@ class MainActivity : AppCompatActivity() {
     private lateinit var animatorsList: List<Animator>
     private lateinit var animationListener: AnimationListener
     private lateinit var appViewModel: AppViewModel
-
-    @Inject
-    lateinit var animationHelper: AnimationHelper
-
-    @Inject
-    lateinit var viewModelFactory: AppViewModelFactory
-
-    @Inject
-    lateinit var settings: SharedPreferences
+    private lateinit var mainFragmentViewModel: MainFragmentViewModel
+    private lateinit var animationHelper: AnimationHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        (application as App).appComponent.injectMainActivity(this)
-        appViewModel = ViewModelProvider(this, viewModelFactory).get(AppViewModel::class.java)
+        resolveDependencies()
         initViews()
         initObservers()
     }
 
+    private fun resolveDependencies() {
+        with((application as App).appComponent) {
+            animationHelper = getAnimationHelper()
+            appViewModel = ViewModelProvider(this@MainActivity, getAppViewModelFactory())
+                .get(AppViewModel::class.java)
+            mainFragmentViewModel =
+                ViewModelProvider(this@MainActivity, getMainFragmentViewModelFactory())
+                    .get(MainFragmentViewModel::class.java)
+        }
+    }
+
     private fun initObservers() {
-        appViewModel.init()
-        appViewModel.showAnimationLiveData.observe(this, Observer { show ->
-            animatorsList = animationHelper.setAnimation(logo, animationListener)
-            animationHelper.showAnimation(animatorsList, show)
-        })
+        //appViewModel.init()
+
         appViewModel.launchProfileLiveData.observe(this, Observer { launchProfile(Unit) })
         appViewModel.openMainFragmentLiveData.observe(this, Observer {
-            openFragment(MainFragment.newInstance()) })
+            openFragment(MainFragment.newInstance())
+        })
+        mainFragmentViewModel.allDataLoaded.observe(this) {
+            animatorsList = animationHelper.setAnimation(logo, animationListener)
+            animationHelper.showAnimation(animatorsList, false)
         }
+    }
 
     private fun initViews() {
         loadLayout = findViewById(R.id.loading)
@@ -80,6 +83,9 @@ class MainActivity : AppCompatActivity() {
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        animatorsList = animationHelper.setAnimation(logo, animationListener)
+        animationHelper.showAnimation(animatorsList, true)
     }
 
     private fun navigateFragment(id: Int): Boolean {

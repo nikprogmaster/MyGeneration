@@ -1,17 +1,19 @@
 package com.kandyba.mygeneration.data.repository
 
 import com.kandyba.mygeneration.data.WallApiMapper
-import com.kandyba.mygeneration.models.data.WallResponse
-import io.reactivex.Single
+import com.kandyba.mygeneration.models.presentation.toEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WallRepositoryImpl(
     private val wallApiMapper: WallApiMapper
 ) : WallRepository {
 
-    override fun getWallPosts(
-        postCount: Int
-    ): Single<WallResponse> {
-        return wallApiMapper.getWallPosts(OWNERS_ID, postCount, VERSION, ACCESS_TOKEN)
+    override suspend fun getWallPosts(postCount: Int) = withContext(Dispatchers.IO) {
+        wallApiMapper.getWallPosts(OWNERS_ID, postCount, VERSION, ACCESS_TOKEN)
+            .response
+            .items
+            ?.map { it.toEntity() } ?: emptyList()
     }
 
     companion object {

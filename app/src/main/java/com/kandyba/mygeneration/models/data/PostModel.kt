@@ -1,317 +1,256 @@
 package com.kandyba.mygeneration.models.data
 
-import com.google.gson.annotations.Expose
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-import com.google.gson.annotations.SerializedName
-
-
+@Serializable
 data class PostModel (
-    @SerializedName("id")
-    @Expose
+    @SerialName("id")
     var id: Int? = null,
 
-    @SerializedName("from_id")
-    @Expose
+    @SerialName("from_id")
     var fromId: Int? = null,
 
-    @SerializedName("owner_id")
-    @Expose
+    @SerialName("owner_id")
     var ownerId: Int? = null,
 
-    @SerializedName("date")
-    @Expose
+    @SerialName("date")
     var date: Int? = null,
 
-    @SerializedName("marked_as_ads")
-    @Expose
+    @SerialName("marked_as_ads")
     var markedAsAds: Int? = null,
 
-    @SerializedName("post_type")
-    @Expose
+    @SerialName("post_type")
     var postType: String? = null,
 
-    @SerializedName("text")
-    @Expose
+    @SerialName("text")
     var text: String? = null,
 
-    @SerializedName("is_pinned")
-    @Expose
+    @SerialName("is_pinned")
     var isPinned: Int? = null,
 
-    @SerializedName("attachments")
-    @Expose
+    @SerialName("attachments")
     var attachments: List<Attachment>? = null,
 
-    @SerializedName("post_source")
-    @Expose
+    @SerialName("post_source")
     var postSource: PostSource? = null,
 
-    @SerializedName("comments")
-    @Expose
+    @SerialName("comments")
     var comments: Comments? = null,
 
-    @SerializedName("likes")
-    @Expose
+    @SerialName("likes")
     var likes: Likes? = null,
 
-    @SerializedName("reposts")
-    @Expose
+    @SerialName("reposts")
     var reposts: Reposts? = null,
 
-    @SerializedName("views")
-    @Expose
+    @SerialName("views")
     var views: Views? = null,
 
-    @SerializedName("donut")
-    @Expose
+    @SerialName("donut")
     var donut: Donut? = null,
 
-    @SerializedName("short_text_rate")
-    @Expose
+    @SerialName("short_text_rate")
     var shortTextRate: Double? = null,
 
-    @SerializedName("hash")
-    @Expose
+    @SerialName("hash")
     var hash: String? = null
 )
 
+@Serializable
 data class Attachment(
-    @SerializedName("type")
-    @Expose
+    @SerialName("type")
     var type: String? = null,
 
-    @SerializedName("video")
-    @Expose
+    @SerialName("video")
     var video: Video? = null,
 
-    @SerializedName("photo")
-    @Expose
+    @SerialName("photo")
     var photo: Photo? = null
 )
 
+@Serializable
 data class Comments (
-    @SerializedName("can_post")
-    @Expose
+    @SerialName("can_post")
     var canPost: Int? = null,
 
-    @SerializedName("count")
-    @Expose
+    @SerialName("count")
     var count: Int? = null,
 
-    @SerializedName("groups_can_post")
-    @Expose
+    @SerialName("groups_can_post")
     var groupsCanPost: Boolean? = null
 )
 
+@Serializable
 data class Donut (
-    @SerializedName("is_donut")
-    @Expose
+    @SerialName("is_donut")
     var isDonut: Boolean? = null
 )
 
+@Serializable
 data class Image (
-    @SerializedName("height")
-    @Expose
+    @SerialName("height")
     var height: Int? = null,
 
-    @SerializedName("url")
-    @Expose
+    @SerialName("url")
     var url: String? = null,
 
-    @SerializedName("width")
-    @Expose
+    @SerialName("width")
     var width: Int? = null,
 
-    @SerializedName("with_padding")
-    @Expose
+    @SerialName("with_padding")
     var withPadding: Int? = null
 )
 
+@Serializable
 data class Likes (
-    @SerializedName("can_like")
-    @Expose
+    @SerialName("can_like")
     var canLike: Int? = null,
 
-    @SerializedName("count")
-    @Expose
+    @SerialName("count")
     var count: Int? = null,
 
-    @SerializedName("user_likes")
-    @Expose
+    @SerialName("user_likes")
     var userLikes: Int? = null,
 
-    @SerializedName("can_publish")
-    @Expose
+    @SerialName("can_publish")
     var canPublish: Int? = null
 )
 
+@Serializable
 data class PostSource (
-    @SerializedName("platform")
-    @Expose
+    @SerialName("platform")
     var platform: String? = null,
 
-    @SerializedName("type")
-    @Expose
+    @SerialName("type")
     var type: String? = null
 )
 
+@Serializable
 data class Reposts (
-    @SerializedName("count")
-    @Expose
+    @SerialName("count")
     var count: Int? = null,
 
-    @SerializedName("user_reposted")
-    @Expose
+    @SerialName("user_reposted")
     var userReposted: Int? = null
 )
 
+@Serializable
 data class Video (
-    @SerializedName("access_key")
-    @Expose
+    @SerialName("access_key")
     var accessKey: String? = null,
 
-    @SerializedName("can_comment")
-    @Expose
+    @SerialName("can_comment")
     var canComment: Int? = null,
 
-    @SerializedName("can_like")
-    @Expose
+    @SerialName("can_like")
     var canLike: Int? = null,
 
-    @SerializedName("can_repost")
-    @Expose
+    @SerialName("can_repost")
     var canRepost: Int? = null,
 
-    @SerializedName("can_subscribe")
-    @Expose
+    @SerialName("can_subscribe")
     var canSubscribe: Int? = null,
 
-    @SerializedName("can_add_to_faves")
-    @Expose
+    @SerialName("can_add_to_faves")
     var canAddToFaves: Int? = null,
 
-    @SerializedName("can_add")
-    @Expose
+    @SerialName("can_add")
     var canAdd: Int? = null,
 
-    @SerializedName("comments")
-    @Expose
+    @SerialName("comments")
     var comments: Int? = null,
 
-    @SerializedName("date")
-    @Expose
+    @SerialName("date")
     var date: Int? = null,
 
-    @SerializedName("duration")
-    @Expose
+    @SerialName("duration")
     var duration: Int? = null,
 
-    @SerializedName("image")
-    @Expose
+    @SerialName("image")
     var image: List<Image>? = null,
 
-    @SerializedName("width")
-    @Expose
+    @SerialName("width")
     var width: Int? = null,
 
-    @SerializedName("height")
-    @Expose
+    @SerialName("height")
     var height: Int? = null,
 
-    @SerializedName("id")
-    @Expose
+    @SerialName("id")
     var id: Int? = null,
 
-    @SerializedName("owner_id")
-    @Expose
+    @SerialName("owner_id")
     var ownerId: Int? = null,
 
-    @SerializedName("title")
-    @Expose
+    @SerialName("title")
     var title: String? = null,
 
-    @SerializedName("track_code")
-    @Expose
+    @SerialName("track_code")
     var trackCode: String? = null,
 
-    @SerializedName("type")
-    @Expose
+    @SerialName("type")
     var type: String? = null,
 
-    @SerializedName("views")
-    @Expose
+    @SerialName("views")
     var views: Int? = null,
 
-    @SerializedName("content_restricted")
-    @Expose
+    @SerialName("content_restricted")
     var contentRestricted: Int? = null,
 
-    @SerializedName("content_restricted_message")
-    @Expose
+    @SerialName("content_restricted_message")
     var contentRestrictedMessage: String? = null
 )
 
+@Serializable
 data class Photo(
 
-    @SerializedName("album_id")
-    @Expose
+    @SerialName("album_id")
     var albumId: Int? = null,
 
-    @SerializedName("date")
-    @Expose
+    @SerialName("date")
     var date: Int? = null,
 
-    @SerializedName("id")
-    @Expose
+    @SerialName("id")
     var id: Int? = null,
 
-    @SerializedName("owner_id")
-    @Expose
+    @SerialName("owner_id")
     var ownerId: Int? = null,
 
-    @SerializedName("has_tags")
-    @Expose
+    @SerialName("has_tags")
     var hasTags: Boolean? = null,
 
-    @SerializedName("access_key")
-    @Expose
+    @SerialName("access_key")
     var accessKey: String? = null,
 
-    @SerializedName("sizes")
-    @Expose
+    @SerialName("sizes")
     var sizes: List<Size?>? = null,
 
-    @SerializedName("text")
-    @Expose
+    @SerialName("text")
     var text: String? = null,
 
-    @SerializedName("user_id")
-    @Expose
+    @SerialName("user_id")
     var userId: Int? = null
 )
 
+@Serializable
 data class Size (
 
-    @SerializedName("height")
-    @Expose
+    @SerialName("height")
     var height: Int? = null,
 
-    @SerializedName("url")
-    @Expose
+    @SerialName("url")
     var url: String? = null,
 
-    @SerializedName("type")
-    @Expose
+    @SerialName("type")
     var type: String? = null,
 
-    @SerializedName("width")
-    @Expose
+    @SerialName("width")
     var width: Int? = null
 )
 
+@Serializable
 data class Views (
-    @SerializedName("count")
-    @Expose
+    @SerialName("count")
     var count: Int? = null
 )
 

@@ -4,30 +4,27 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.kandyba.mygeneration.data.repository.UserRepository
 import com.kandyba.mygeneration.models.EMPTY_STRING
-import com.kandyba.mygeneration.models.data.AccountType
-import com.kandyba.mygeneration.models.data.User
+import com.kandyba.mygeneration.models.data.UserModel
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileInputStream
-import javax.inject.Inject
 
-class ProfileViewModel @Inject constructor(
-    private val userConverter: UserConverter
-) : ViewModel() {
+class ProfileViewModel(
+    private val userConverter: UserConverter,
+    private val userRepository: UserRepository
+) : BaseViewModel() {
 
     private val showLoggedUserLayout = MutableLiveData<Boolean>()
-    private val userInfo = MutableLiveData<User>()
+    private val userInfo = MutableLiveData<UserModel>()
     private val signInUser = MutableLiveData<Unit>()
     private val sharedPreferencesUserInfo = MutableLiveData<Map<UserField, String?>>()
     private val showReservedUserInfo = MutableLiveData<Unit>()
@@ -35,13 +32,14 @@ class ProfileViewModel @Inject constructor(
 
     private lateinit var auth: FirebaseAuth
     private lateinit var settings: SharedPreferences
+    private val changedFieldsList = mutableMapOf<UserField, String>()
 
     /** [LiveData] для отображения layout залогиненного пользователя */
     val showLoggedUserLayoutLiveData: LiveData<Boolean>
         get() = showLoggedUserLayout
 
     /** [LiveData] для получения информации о пользователе */
-    val userInfoLiveData: LiveData<User>
+    val userModelInfoLiveData: LiveData<UserModel>
         get() = userInfo
 
     /** [LiveData] о том, что пользователь залогинился */
@@ -83,54 +81,28 @@ class ProfileViewModel @Inject constructor(
 
     fun successfullySigned(firebaseUser: FirebaseUser, providerType: String? = null) {
         showLoggedUserLayout.value = true
-        val databaseReference = FirebaseDatabase.getInstance().reference
-        val ref = databaseReference.child(USER_DATABASE_ENDPOINT).child(firebaseUser.uid)
-        ref.addValueEventListener(object : ValueEventListener {
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var user = snapshot.getValue(User::class.java)
-                if (user != null) {
-                    userInfo.value = user
-                    sharedPreferencesUserInfo.value = userConverter.convertForSettings(user)
-                    showProgressBar.value = false
-                } else {
-                    user = providerType?.let { createUser(firebaseUser, it) }
-                    databaseReference.child(USER_DATABASE_ENDPOINT).child(firebaseUser.uid)
-                        .setValue(user)
+        viewModelScope.launch {
+            userRepository.getUserInfo(firebaseUser.uid)
+                .catch { Log.e(TAG, it.message.toString()) }
+                .collect { user ->
+                    if (user != null) {
+                        userInfo.value = user
+                        sharedPreferencesUserInfo.value = userConverter.convertForSettings(user)
+                        showProgressBar.value = false
+                    } else {
+                        userRepository.createUser(firebaseUser, providerType)
+                    }
                 }
-            }
-
-        })
+        }
     }
 
-    private fun deleteUserFromDatabase() {
-        val databaseReference = FirebaseDatabase.getInstance().reference
-        val ref = databaseReference.child(USER_DATABASE_ENDPOINT).child(
-            settings.getString(UserField.ID.preferencesKey, EMPTY_STRING) ?: EMPTY_STRING
-        )
-        ref.removeValue()
+    fun addChangedField(field: UserField, value: String) {
+        changedFieldsList[field] = value
     }
 
-    private fun createUser(firebaseUser: FirebaseUser, providerType: String) =
-        User(
-            firebaseUser.uid,
-            firebaseUser.displayName ?: EMPTY_STRING,
-            providerType,
-            firebaseUser.email ?: EMPTY_STRING,
-            firebaseUser.phoneNumber ?: EMPTY_STRING,
-            EMPTY_STRING,
-            AccountType.TEAMER.title,
-            EMPTY_STRING,
-            EMPTY_STRING
-        )
 
-
-    fun changeUserInfo(changedFields: Map<UserField, String>) {
-        for (i in changedFields) {
+    fun changeUserInfo() {
+        for (i in changedFieldsList) {
             when (i.key) {
                 UserField.NAME -> changeUserField(i.key.preferencesKey, i.value)
                 UserField.PHONE -> changeUserField(i.key.preferencesKey, i.value)
@@ -144,15 +116,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun changeUserField(endpoint: String, value: String) {
-        val userId = auth.currentUser?.uid
-        val databaseReference = FirebaseDatabase.getInstance().reference
-        userId?.let {
-            val ref = databaseReference.child(USER_DATABASE_ENDPOINT)
-                .child(userId)
-                .child(endpoint)
-            ref.setValue(value)
+        viewModelScope.launch {
+            auth.currentUser?.uid?.let { userRepository.changeUserInfo(value, endpoint, it) }
         }
-
     }
 
     fun signInUser() {
@@ -160,24 +126,25 @@ class ProfileViewModel @Inject constructor(
         showProgressBar.value = true
     }
 
-    fun uploadUserAvatar(file: File?, id: String?) {
-        Log.i("File path", file?.absolutePath.toString())
-        Log.i("File path can", file?.canonicalPath.toString())
-        val stream = FileInputStream(file?.absoluteFile)
-        val storage = Firebase.storage
-
-        id?.let {
-            val avatarRef = storage.reference.child("avatars/${it}.jpg")
-            val uploadTask = avatarRef.putStream(stream)
-            uploadTask.addOnFailureListener {
-                Log.i("Avatar", "Error")
-            }.addOnSuccessListener { taskSnapshot ->
-                Log.i("Avatar", "Success")
-            }
+    fun changeUserAvatar(file: File?, id: String?) {
+        viewModelScope.launch {
+            userRepository.uploadUserAvatar(file, id)
+                ?.addOnSuccessListener { }
+                ?.addOnFailureListener { }
         }
     }
 
+
+    private fun deleteUserFromDatabase() {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        val ref = databaseReference.child(USER_DATABASE_ENDPOINT).child(
+            settings.getString(UserField.ID.preferencesKey, EMPTY_STRING) ?: EMPTY_STRING
+        )
+        ref.removeValue()
+    }
+
     companion object {
+        private const val TAG = "ProfileViewModel"
         private const val USER_DATABASE_ENDPOINT = "users"
     }
 }
