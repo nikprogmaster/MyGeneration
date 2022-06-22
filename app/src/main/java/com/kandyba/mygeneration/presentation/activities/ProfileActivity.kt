@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -31,10 +32,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.EMPTY_STRING
-import com.kandyba.mygeneration.models.data.AuthType
-import com.kandyba.mygeneration.models.data.UserModel
 import com.kandyba.mygeneration.models.presentation.FileUtils
+import com.kandyba.mygeneration.models.presentation.user.AuthType
+import com.kandyba.mygeneration.models.presentation.user.User
 import com.kandyba.mygeneration.models.presentation.user.UserField
+import com.kandyba.mygeneration.models.presentation.user.toRegionCode
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.animation.ProfileAnimation
 import com.kandyba.mygeneration.presentation.animation.show
@@ -54,6 +56,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var phone: TextInputEditText
     private lateinit var birthday: TextInputEditText
     private lateinit var city: TextInputEditText
+    private lateinit var region: TextInputEditText
     private lateinit var signInButton: Button
     private lateinit var loggedUserLayout: NestedScrollView
     private lateinit var unloggedUserLayout: LinearLayout
@@ -63,8 +66,10 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var progressLayout: LinearLayout
 
     private lateinit var viewModel: ProfileViewModel
-    lateinit var settings: SharedPreferences
-    lateinit var profileAnimation: ProfileAnimation
+    private lateinit var settings: SharedPreferences
+    private lateinit var profileAnimation: ProfileAnimation
+
+    private var regionMenu: PopupMenu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,6 +150,7 @@ class ProfileActivity : AppCompatActivity() {
         phone = findViewById(R.id.phone)
         birthday = findViewById(R.id.birthday)
         city = findViewById(R.id.city)
+        region = findViewById(R.id.region)
         signInButton = findViewById(R.id.sign_in)
         loggedUserLayout = findViewById(R.id.logged_user_layout)
         unloggedUserLayout = findViewById(R.id.unlogged_user_layout)
@@ -154,7 +160,6 @@ class ProfileActivity : AppCompatActivity() {
         logged = findViewById(R.id.logged)
         progressLayout = findViewById(R.id.loading)
         setSupportActionBar(toolbar)
-
     }
 
     private fun initListeners() {
@@ -186,10 +191,8 @@ class ProfileActivity : AppCompatActivity() {
                 avatar,
                 loggedUserLayout,
                 finishListener
-            )
-                .show()
+            ).show()
             saveButton.visibility = View.GONE
-            editButton.isEnabled = false
             viewModel.changeUserInfo()
         }
         exitButton.setOnClickListener {
@@ -199,7 +202,28 @@ class ProfileActivity : AppCompatActivity() {
         avatar.setOnClickListener {
             requestAccessToPhotoPermission()
         }
+        region.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(region.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                regionMenu?.show()
+                region.clearFocus()
+            }
+        }
         setTextWatchers()
+        setMenuToRegion()
+    }
+
+    private fun setMenuToRegion() {
+        regionMenu = PopupMenu(this, region)
+        regionMenu?.let {
+            it.menu.add("Москва")
+            it.menu.add("Санкт-Петербург")
+            it.setOnMenuItemClickListener { item ->
+                region.setText(item.title)
+                true
+            }
+        }
     }
 
     private fun launchImageChooser() {
@@ -224,6 +248,9 @@ class ProfileActivity : AppCompatActivity() {
         }
         birthday.addTextChangedListener {
             viewModel.addChangedField(UserField.BIRTHDAY, it.toString())
+        }
+        region.addTextChangedListener {
+            viewModel.addChangedField(UserField.REGION, it.toString().toRegionCode())
         }
     }
 
@@ -311,6 +338,7 @@ class ProfileActivity : AppCompatActivity() {
         phone.isEnabled = flag
         birthday.isEnabled = flag
         city.isEnabled = flag
+        region.isEnabled = flag
         if (flag) {
             when (settings.getString(UserField.AUTH_TYPE.preferencesKey, EMPTY_STRING)
                 ?: EMPTY_STRING) {
@@ -330,7 +358,7 @@ class ProfileActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    private fun setFields(userModel: UserModel) {
+    private fun setFields(userModel: User) {
         if (userModel.name != null) {
             fioLayout.isHintEnabled = false
         }
@@ -338,8 +366,9 @@ class ProfileActivity : AppCompatActivity() {
         login.setText(userModel.email)
         phone.setText(userModel.phoneNumber)
         birthday.setText(userModel.birthday)
-        accountType.setText(userModel.accountType)
+        accountType.setText(userModel.accountType?.title)
         city.setText(userModel.city)
+        region.setText(userModel.region?.regionName)
 
         //TODO: Нужно понять, как по uri фотку сетать!!!
         //avatar.setImageResource(user.photoUrl)
@@ -359,6 +388,7 @@ class ProfileActivity : AppCompatActivity() {
         birthday.setText(settings.getString(UserField.BIRTHDAY.preferencesKey, EMPTY_STRING))
         city.setText(settings.getString(UserField.CITY.preferencesKey, EMPTY_STRING))
         accountType.setText(settings.getString(UserField.ACCOUNT_TYPE.preferencesKey, EMPTY_STRING))
+        region.setText(settings.getString(UserField.REGION.preferencesKey, EMPTY_STRING))
     }
 
     private fun showLoggedUserLayout(flag: Boolean) {

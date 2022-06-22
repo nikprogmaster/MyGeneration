@@ -7,8 +7,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
-import com.kandyba.mygeneration.models.EMPTY_STRING
-import com.kandyba.mygeneration.models.data.AccountType
 import com.kandyba.mygeneration.models.data.UserModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -109,10 +107,8 @@ class UserDatabaseSource {
             providerType,
             firebaseUser.email.orEmpty(),
             firebaseUser.phoneNumber.orEmpty(),
-            EMPTY_STRING,
-            AccountType.TEAMER.title,
-            EMPTY_STRING,
-            EMPTY_STRING
+            null,
+            providerType
         )
 
     companion object {

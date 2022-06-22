@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.kandyba.mygeneration.data.repository.UserRepository
 import com.kandyba.mygeneration.models.EMPTY_STRING
-import com.kandyba.mygeneration.models.data.UserModel
+import com.kandyba.mygeneration.models.presentation.user.User
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
 import kotlinx.coroutines.flow.catch
@@ -24,7 +24,7 @@ class ProfileViewModel(
 ) : BaseViewModel() {
 
     private val showLoggedUserLayout = MutableLiveData<Boolean>()
-    private val userInfo = MutableLiveData<UserModel>()
+    private val userInfo = MutableLiveData<User>()
     private val signInUser = MutableLiveData<Unit>()
     private val sharedPreferencesUserInfo = MutableLiveData<Map<UserField, String?>>()
     private val showReservedUserInfo = MutableLiveData<Unit>()
@@ -39,7 +39,7 @@ class ProfileViewModel(
         get() = showLoggedUserLayout
 
     /** [LiveData] для получения информации о пользователе */
-    val userModelInfoLiveData: LiveData<UserModel>
+    val userModelInfoLiveData: LiveData<User>
         get() = userInfo
 
     /** [LiveData] о том, что пользователь залогинился */
@@ -103,14 +103,7 @@ class ProfileViewModel(
 
     fun changeUserInfo() {
         for (i in changedFieldsList) {
-            when (i.key) {
-                UserField.NAME -> changeUserField(i.key.preferencesKey, i.value)
-                UserField.PHONE -> changeUserField(i.key.preferencesKey, i.value)
-                UserField.CITY -> changeUserField(i.key.preferencesKey, i.value)
-                UserField.BIRTHDAY -> changeUserField(i.key.preferencesKey, i.value)
-                UserField.ACCOUNT_TYPE -> changeUserField(i.key.preferencesKey, i.value)
-                UserField.EMAIL -> changeUserField(i.key.preferencesKey, i.value)
-            }
+            changeUserField(i.key.preferencesKey, i.value)
         }
         auth.currentUser?.let { successfullySigned(it) }
     }

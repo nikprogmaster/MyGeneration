@@ -19,6 +19,7 @@
     <string name="phone">Телефон</string>
     <string name="birthday">Дата рождения</string>
     <string name="city">Город</string>
+    <string name="region">Регион</string>
     <string name="auth_explanation">Чтобы использовать все \n функции приложения, авторизуйтесь</string>
     <string name="enter">Войти</string>
     <string name="name">Имя</string>

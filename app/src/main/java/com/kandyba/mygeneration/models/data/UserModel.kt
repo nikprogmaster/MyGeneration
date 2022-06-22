@@ -1,8 +1,9 @@
 package com.kandyba.mygeneration.models.data
 
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.PhoneAuthProvider
+import com.kandyba.mygeneration.models.presentation.user.User
+import com.kandyba.mygeneration.models.presentation.user.toAccountType
+import com.kandyba.mygeneration.models.presentation.user.toAuthType
+import com.kandyba.mygeneration.models.presentation.user.toRegion
 
 data class UserModel(
     val id: String? = null,
@@ -13,16 +14,19 @@ data class UserModel(
     val birthday: String? = null,
     val accountType: String? = null,
     val city: String? = null,
+    val region: String? = null,
     var photoUri: String? = null
 )
 
-enum class AccountType(val title: String) {
-    TEAMER("Тимер"),
-    MODERATOR("Модератор")
-}
-
-enum class AuthType(val title: String) {
-    GOOGLE(GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD),
-    EMAIL(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD),
-    PHONE(PhoneAuthProvider.PHONE_SIGN_IN_METHOD)
-}
+fun UserModel.toUser() = User(
+    id,
+    name,
+    authType?.toAuthType(),
+    email,
+    phoneNumber,
+    birthday,
+    accountType?.toAccountType(),
+    city,
+    region?.toRegion(),
+    photoUri
+)
