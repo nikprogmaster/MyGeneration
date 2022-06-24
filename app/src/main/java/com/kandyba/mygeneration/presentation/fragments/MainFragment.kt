@@ -9,17 +9,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.CalendarManager
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import com.kandyba.mygeneration.models.presentation.calendar.addEventsToMap
-import com.kandyba.mygeneration.presentation.activities.MainActivity
 import com.kandyba.mygeneration.presentation.adapters.PostsAdapter
 import com.kandyba.mygeneration.presentation.binder.CalendarDayBinder
+import com.kandyba.mygeneration.presentation.utils.addEventsToMap
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
 import com.kizitonwose.calendarview.CalendarView
 
@@ -61,23 +59,13 @@ class MainFragment : Fragment() {
     }
 
     private fun initObservers() {
-        viewModel.events.observe(requireActivity(), Observer { events ->
+        viewModel.events.observe(requireActivity()) { events ->
             setCalendarDayBinder(events)
             setCalendarManager()
-        })
-        viewModel.openBottomEventSheet.observe(requireActivity(), Observer { events ->
-            openBottomSheetFragment(events)
-        })
-        viewModel.vkPosts.observe(requireActivity(), Observer { posts ->
+        }
+        viewModel.vkPosts.observe(requireActivity()) { posts ->
             postsAdapter = PostsAdapter(posts)
             postsRecyclerView.adapter = postsAdapter
-        })
-    }
-
-    private fun openBottomSheetFragment(events: List<Event>) {
-        val activity = requireActivity()
-        if (activity is MainActivity) {
-            activity.openBottomSheetFragment(events)
         }
     }
 
@@ -91,9 +79,10 @@ class MainFragment : Fragment() {
 
     private fun setCalendarDayBinder(allEvents: List<Event>) {
         val map = addEventsToMap(allEvents)
-        calendarDayBinder = CalendarDayBinder(map, requireContext()) { events ->
-            viewModel.openBottomCalendarFragment(events)
-        }
+        calendarDayBinder = CalendarDayBinder(map, requireContext(),
+            { events -> viewModel.openBottomFragment(BottomCalendarDialogFragment.newInstance(events)) },
+            { viewModel.openBottomFragment(AskAddEventDialogFragment.newInstance()) }
+        )
         calendarView.dayBinder = calendarDayBinder
     }
 

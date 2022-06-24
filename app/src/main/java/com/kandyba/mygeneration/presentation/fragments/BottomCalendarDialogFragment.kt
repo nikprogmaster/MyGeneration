@@ -6,16 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.annotation.NonNull
 import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
@@ -23,7 +18,7 @@ import com.kandyba.mygeneration.presentation.adapters.EventAdapter
 import com.kandyba.mygeneration.presentation.viewmodel.CalendarDialogViewModel
 
 
-class BottomCalendarDialogFragment : BottomSheetDialogFragment() {
+class BottomCalendarDialogFragment : BaseBottomSheetFragment() {
 
     private lateinit var eventsRecyclerView: RecyclerView
     private lateinit var eventsAdapter: EventAdapter
@@ -39,6 +34,7 @@ class BottomCalendarDialogFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
         rootView = inflater.inflate(R.layout.bottom_calendar_fragment, container, false)
         addEventButton = rootView.findViewById(R.id.add_event)
         addEventButton.setOnClickListener { viewModel.addNewEvent("NewEvent") }
@@ -53,6 +49,7 @@ class BottomCalendarDialogFragment : BottomSheetDialogFragment() {
             val div = rootView.findViewById<ImageView>(R.id.stick)
             bottomSheetBehavior.peekHeight = eventsRecyclerView[0].height + div.height
         }
+
         return rootView
     }
 
@@ -66,39 +63,6 @@ class BottomCalendarDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun solveNotRoundedCornersProblem() {
-        (dialog as BottomSheetDialog).behavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    val newMaterialShapeDrawable = createMaterialShapeDrawable(bottomSheet)
-                    bottomSheet.background = newMaterialShapeDrawable
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-        })
-    }
-
-    private fun createMaterialShapeDrawable(@NonNull bottomSheet: View): MaterialShapeDrawable {
-        val shapeAppearanceModel =
-            //Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
-            ShapeAppearanceModel.builder(context, 0, R.style.MyShapeAppearance)
-                .build()
-
-        //Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
-        val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
-        val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
-        //Copy the attributes in the new MaterialShapeDrawable
-        newMaterialShapeDrawable.initializeElevationOverlay(context)
-        newMaterialShapeDrawable.fillColor = currentMaterialShapeDrawable.fillColor
-        newMaterialShapeDrawable.tintList = currentMaterialShapeDrawable.tintList
-        newMaterialShapeDrawable.elevation = currentMaterialShapeDrawable.elevation
-        newMaterialShapeDrawable.strokeWidth = currentMaterialShapeDrawable.strokeWidth
-        newMaterialShapeDrawable.strokeColor = currentMaterialShapeDrawable.strokeColor
-        return newMaterialShapeDrawable
-    }
 
     companion object {
         private const val EVENT_LIST = "events"

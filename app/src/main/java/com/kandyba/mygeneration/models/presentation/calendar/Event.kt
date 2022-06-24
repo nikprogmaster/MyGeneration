@@ -7,7 +7,7 @@ data class Event(
     val id: String?,
     val name: String?,
     val description: String?,
-    val startDay: String?,
+    val day: String?,
     val startTime: String?,
     val finishTime: String?
 ): Parcelable {
@@ -29,7 +29,7 @@ data class Event(
         dest?.writeString(id)
         dest?.writeString(name)
         dest?.writeString(description)
-        dest?.writeString(startDay)
+        dest?.writeString(day)
         dest?.writeString(startTime)
         dest?.writeString(finishTime)
     }

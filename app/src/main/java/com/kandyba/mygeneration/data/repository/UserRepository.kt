@@ -10,9 +10,9 @@ interface UserRepository {
 
     fun getUserInfo(uid: String): Flow<User?>
 
-    suspend fun createUser(authUser: FirebaseUser, providerType: String?)
+    suspend fun createUser(authUser: FirebaseUser, providerType: String?): Boolean
 
-    suspend fun changeUserInfo(value: String, valueEndpoint: String, uid: String)
+    suspend fun changeUserInfo(value: String, valueEndpoint: String, uid: String): Boolean
 
     suspend fun uploadUserAvatar(file: File?, id: String?): UploadTask?
 

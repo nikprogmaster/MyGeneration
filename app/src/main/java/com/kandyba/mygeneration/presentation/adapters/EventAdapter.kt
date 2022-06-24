@@ -42,7 +42,7 @@ class EventAdapter(
         fun bindViews(event: Event) {
             name.text = event.name
             description.text = event.description
-            date.text = event.startDay
+            date.text = event.day
             val timeDisplayed = "${event.startTime} - ${event.finishTime}"
             time.text = timeDisplayed
             if (events.size > 1) {

@@ -1,6 +1,7 @@
 package com.kandyba.mygeneration.presentation.viewmodel
 
 import android.util.Log
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -22,14 +23,14 @@ class MainFragmentViewModel(
     private var postCount = INITIAL_POSTS_COUNT
 
     private val _events = MutableLiveData<List<Event>>()
-    private val _openBottomEventSheet = SingleLiveEvent<List<Event>>()
+    private val _openBottomSheet = SingleLiveEvent<DialogFragment>()
     private val _vkPosts = MutableLiveData<List<VkPost>>()
     private val _allDataLoaded = MutableLiveData<Unit>()
 
     val events: LiveData<List<Event>>
         get() = _events
-    val openBottomEventSheet: LiveData<List<Event>>
-        get() = _openBottomEventSheet
+    val openBottomSheet: LiveData<DialogFragment>
+        get() = _openBottomSheet
     val vkPosts: LiveData<List<VkPost>>
         get() = _vkPosts
     val allDataLoaded: LiveData<Unit>
@@ -83,8 +84,8 @@ class MainFragmentViewModel(
         regionsRepository.getRegions()
     }
 
-    fun openBottomCalendarFragment(event: List<Event>) {
-        _openBottomEventSheet.value = event
+    fun openBottomFragment(fragment: DialogFragment) {
+        _openBottomSheet.value = fragment
     }
 
     companion object {

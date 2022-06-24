@@ -9,6 +9,7 @@
         <item name="bottomSheetDialogTheme">@style/MyBottomSheetStyle</item>
     </style>
 
+    <!-- region Button styles -->
     <style name="MyOutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/colorPrimaryDark</item>
     </style>
@@ -21,15 +22,9 @@
         <item name="android:textColor">@color/colorPrimaryDark</item>
         <item name="backgroundTint">@color/button_selector</item>
     </style>
+    <!-- endregion -->
 
-    <style name="FirebaseLoginTheme" parent="FirebaseUI">
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@drawable/bg_auth</item>
-    </style>
-
+    <!-- region Dialog and BottomSheet styles -->
     <style name="MyCardViewStyle" parent="Theme.AppCompat.Light">
         <item name="cardCornerRadius">@dimen/medium</item>
         <item name="cardElevation">@dimen/xxsmall</item>
@@ -40,7 +35,13 @@
         <item name="cardBackgroundColor">#FFFFFF</item>
     </style>
 
-    <style name="MyBottomSheetStyle" parent="ThemeOverlay.MaterialComponents.Light.BottomSheetDialog">
+    <style name="MyDialogStyle" parent="android:style/Theme.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="MyBottomSheetStyle" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/AppModalStyle</item>
     </style>
 
@@ -54,6 +55,44 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopLeft">@dimen/medium</item>
         <item name="cornerSizeTopRight">@dimen/medium</item>
+    </style>
+    <!-- endregion -->
+
+    <!-- region Picker styles -->
+    <style name="ThemeOverlay.App.DatePicker" parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="colorPrimary">@color/sea_wave</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="buttonBarPositiveButtonStyle">@style/DatePickerButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DatePickerButton</item>
+    </style>
+
+    <style name="DatePickerButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TimePickerClock" parent="Widget.MaterialComponents.TimePicker.Clock">
+        <item name="clockHandColor">@color/sea_wave</item>
+        <item name="clockNumberTextColor">@color/black</item>
+    </style>
+
+    <style name="TimePickerDisplay" parent="Widget.MaterialComponents.TimePicker.Display">
+        <item name="chipBackgroundColor">@color/chip_background_color</item>
+    </style>
+
+    <style name="ThemeOverlay.App.TimePicker" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="chipStyle">@style/TimePickerDisplay</item>
+        <item name="materialClockStyle">@style/TimePickerClock</item>
+    </style>
+    <!-- endregion -->
+
+    <!-- region Firebase styles -->
+    <style name="FirebaseLoginTheme" parent="FirebaseUI">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@drawable/bg_auth</item>
     </style>
 
     <style name="FirebaseUI.Button.AccountChooser.GoogleButton">
@@ -88,12 +127,6 @@
         <item name="android:paddingLeft">4dp</item>
         <item name="android:paddingRight">4dp</item>
     </style>
-
-    <style name="FirebaseUI.AuthMethodPicker.Logo">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_marginTop">80dp</item>
-        <item name="android:contentDescription">@string/fui_accessibility_logo</item>
-    </style>
+    <!-- endregion -->
 
 </resources>

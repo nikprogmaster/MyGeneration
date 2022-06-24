@@ -28,4 +28,15 @@
     <string name="roll_up">Свернуть</string>
     <string name="zero">0</string>
     <string name="image_chooser_title">Выберите фото</string>
+    <string name="add">Добавить</string>
+    <string name="cancel">Отмена</string>
+    <string name="add_event_q">Добавить событие?</string>
+    <string name="new_event">Новое событие</string>
+    <string name="event_name">Название</string>
+    <string name="event_description">Описание</string>
+    <string name="event_date">Дата</string>
+    <string name="start_time">Время начала</string>
+    <string name="finish_time">Время конца</string>
+    <string name="choose_date">Выберите дату</string>
+    <string name="choose_time">Выберите время</string>
 </resources>

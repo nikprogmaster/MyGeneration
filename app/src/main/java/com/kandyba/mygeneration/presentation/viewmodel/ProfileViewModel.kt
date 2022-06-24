@@ -108,7 +108,7 @@ class ProfileViewModel(
                         sharedPreferencesUserInfo.value = userConverter.convertForSettings(user)
                         showProgressBar.value = false
                     } else {
-                        userRepository.createUser(firebaseUser, providerType)
+                       createUser(firebaseUser, providerType)
                     }
                 }
         }
@@ -118,18 +118,11 @@ class ProfileViewModel(
         changedFieldsList[field] = value
     }
 
-
     fun changeUserInfo() {
         for (i in changedFieldsList) {
             changeUserField(i.key.preferencesKey, i.value)
         }
         auth.currentUser?.let { successfullySigned(it) }
-    }
-
-    private fun changeUserField(endpoint: String, value: String) {
-        viewModelScope.launch {
-            auth.currentUser?.uid?.let { userRepository.changeUserInfo(value, endpoint, it) }
-        }
     }
 
     fun signInUser() {
@@ -142,6 +135,34 @@ class ProfileViewModel(
             userRepository.uploadUserAvatar(file, id)
                 ?.addOnSuccessListener { }
                 ?.addOnFailureListener { }
+        }
+    }
+
+    private fun createUser(firebaseUser: FirebaseUser, providerType: String? = null) {
+        viewModelScope.launch {
+            try {
+                // if result is false, notify user that changing info failed
+                val result = userRepository.createUser(firebaseUser, providerType)
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
+        }
+    }
+
+    private fun changeUserField(endpoint: String, value: String) {
+        viewModelScope.launch {
+            try {
+                // if result is false, notify user that changing info failed
+                val result = auth.currentUser?.uid?.let {
+                    userRepository.changeUserInfo(
+                        value,
+                        endpoint,
+                        it
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
         }
     }
 

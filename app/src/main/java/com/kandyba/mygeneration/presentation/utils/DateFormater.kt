@@ -1,11 +1,11 @@
-package com.kandyba.mygeneration.models.presentation.calendar
+package com.kandyba.mygeneration.presentation.utils
 
-import android.util.Log
 import com.kandyba.mygeneration.models.EMPTY_STRING
+import com.kandyba.mygeneration.models.presentation.calendar.Event
+import com.kandyba.mygeneration.models.presentation.calendar.Month
 import com.kizitonwose.calendarview.model.CalendarDay
+import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 fun formatDate(month: Int): String =
     when (month) {
@@ -24,7 +24,6 @@ fun formatDate(month: Int): String =
         else -> EMPTY_STRING
     }
 
-
 fun parseDateFromString(date: String): Calendar {
     val calendar = Calendar.getInstance()
     return calendar.also {
@@ -42,8 +41,8 @@ fun parseDateFromString(date: String): Calendar {
 fun addEventsToMap(events: List<Event>): HashMap<Calendar, MutableList<Event>> {
     val map = HashMap<Calendar, MutableList<Event>>()
     for (event in events) {
-        event.startDay?.let {
-            val cal = parseDateFromString(event.startDay)
+        event.day?.let {
+            val cal = parseDateFromString(event.day)
             if (map.containsKey(cal)) {
                 map[cal]?.add(event)
             } else {
@@ -63,3 +62,13 @@ fun parseDateFromCalendarDay(day: CalendarDay): Calendar {
         this.set(Calendar.SECOND, 0)
     }
 }
+
+fun Calendar.formatDateForUser() =
+    "${this[Calendar.DAY_OF_MONTH]} ${
+        this.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+    }"
+
+fun Calendar.formatDateForFirebase() =
+    SimpleDateFormat(FIREBASE_FORMAT, Locale.getDefault()).format(Date(this.timeInMillis))
+
+const val FIREBASE_FORMAT = "dd.MM.yyyy"

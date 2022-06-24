@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.DayViewContainer
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import com.kandyba.mygeneration.models.presentation.calendar.parseDateFromCalendarDay
+import com.kandyba.mygeneration.presentation.utils.parseDateFromCalendarDay
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
@@ -18,7 +18,8 @@ import java.util.*
 class CalendarDayBinder(
     private val eventsMap: HashMap<Calendar, MutableList<Event>>,
     private var context: Context?,
-    private val action: (List<Event>) -> Unit
+    private val onEventDayClick: (List<Event>) -> Unit,
+    private val onEmptyDayClick: () -> Unit
 ) : DayBinder<DayViewContainer> {
 
     private val today = Calendar.getInstance()
@@ -41,7 +42,9 @@ class CalendarDayBinder(
         }
         container.view.setOnClickListener {
             if (eventsMap.containsKey(date)) {
-                action.invoke(eventsMap.getOrDefault(date, mutableListOf()))
+                onEventDayClick.invoke(eventsMap.getOrDefault(date, mutableListOf()))
+            } else {
+                onEmptyDayClick.invoke()
             }
         }
     }

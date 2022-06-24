@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,10 +17,8 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
-import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.presentation.animation.AnimationHelper
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
-import com.kandyba.mygeneration.presentation.fragments.BottomCalendarDialogFragment
 import com.kandyba.mygeneration.presentation.fragments.MainFragment
 import com.kandyba.mygeneration.presentation.viewmodel.AppViewModel
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
@@ -60,9 +59,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        //appViewModel.init()
-
-        appViewModel.launchProfileLiveData.observe(this, Observer { launchProfile(Unit) })
+        appViewModel.launchProfileLiveData.observe(this, ::launchProfile)
         appViewModel.openMainFragmentLiveData.observe(this, Observer {
             openFragment(MainFragment.newInstance())
         })
@@ -70,6 +67,7 @@ class MainActivity : AppCompatActivity() {
             animatorsList = animationHelper.setAnimation(logo, animationListener)
             animationHelper.showAnimation(animatorsList, false)
         }
+        mainFragmentViewModel.openBottomSheet.observe(this, ::openBottomSheetFragment)
     }
 
     private fun initViews() {
@@ -128,8 +126,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun openBottomSheetFragment(event: List<Event>) {
-        BottomCalendarDialogFragment.newInstance(event)
-            .show(supportFragmentManager, null)
+    private fun openBottomSheetFragment(fragment: DialogFragment) {
+        fragment.show(supportFragmentManager, null)
     }
 }

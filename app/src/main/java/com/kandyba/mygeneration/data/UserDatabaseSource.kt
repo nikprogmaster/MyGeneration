@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
 import java.io.FileInputStream
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class UserDatabaseSource {
 
@@ -53,12 +55,12 @@ class UserDatabaseSource {
         awaitClose { listener?.let { ref?.removeEventListener(it) } }
     }
 
-    fun changeUserInfo(
+    suspend fun changeUserInfo(
         valueEndpoint: String,
         value: String,
         uid: String,
         userDatabaseEndpoint: String
-    ) {
+    ): Boolean = suspendCoroutine { continuation ->
         var ref: DatabaseReference? = null
         try {
             ref = databaseReference
@@ -68,10 +70,16 @@ class UserDatabaseSource {
         } catch (e: Throwable) {
             Log.e(e.cause.toString(), e.message.toString())
         }
-        ref?.setValue(value)
+        val task = ref?.setValue(value)
+        task?.addOnSuccessListener { continuation.resume(true) }
+            ?.addOnFailureListener { continuation.resume(false) }
     }
 
-    fun createUser(authUser: FirebaseUser, providerType: String?, userDatabaseEndpoint: String) {
+    suspend fun createUser(
+        authUser: FirebaseUser,
+        providerType: String?,
+        userDatabaseEndpoint: String
+    ): Boolean = suspendCoroutine { continuation ->
         val user = createUserModelInternal(authUser, providerType)
         var ref: DatabaseReference? = null
         try {
@@ -81,7 +89,9 @@ class UserDatabaseSource {
         } catch (e: Throwable) {
             Log.e(e.cause.toString(), e.message.toString())
         }
-        ref?.setValue(user)
+        val task = ref?.setValue(user)
+        task?.addOnSuccessListener { continuation.resume(true) }
+            ?.addOnFailureListener { continuation.resume(false) }
     }
 
     fun uploadUserAvatar(file: File?, id: String?): UploadTask? {
