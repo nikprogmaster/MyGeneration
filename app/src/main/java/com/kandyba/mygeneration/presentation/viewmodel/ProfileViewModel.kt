@@ -8,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import com.kandyba.mygeneration.data.repository.EventsRepository
 import com.kandyba.mygeneration.data.repository.RegionsRepository
 import com.kandyba.mygeneration.data.repository.UserRepository
 import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.data.RegionModel
+import com.kandyba.mygeneration.models.presentation.user.Region
 import com.kandyba.mygeneration.models.presentation.user.User
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
@@ -23,7 +25,8 @@ import java.io.File
 class ProfileViewModel(
     private val userConverter: UserConverter,
     private val userRepository: UserRepository,
-    private val regionsRepository: RegionsRepository
+    private val regionsRepository: RegionsRepository,
+    private val eventsRepository: EventsRepository
 ) : BaseViewModel() {
 
     private val showLoggedUserLayout = MutableLiveData<Boolean>()
@@ -66,6 +69,7 @@ class ProfileViewModel(
         get() = regions
 
     fun init(prefs: SharedPreferences) {
+        Log.i(TAG, eventsRepository.toString())
         loadRegions()
         auth = FirebaseAuth.getInstance()
         settings = prefs
@@ -76,6 +80,18 @@ class ProfileViewModel(
         } else {
             showReservedUserInfo.value = Unit
             decideIfUserIsAlive()
+        }
+    }
+
+    fun updateEvents(regionCode: String, afterDate: Long = 0) {
+        Log.d(TAG, "updateEvents() called with: regionCode = $regionCode, afterDate = $afterDate")
+        viewModelScope.launch {
+            try {
+                val e = eventsRepository.updateEvents(regionCode, afterDate)
+                Log.i(TAG, e.toString())
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
         }
     }
 
@@ -103,12 +119,13 @@ class ProfileViewModel(
             userRepository.getUserInfo(firebaseUser.uid)
                 .catch { Log.e(TAG, it.message.toString()) }
                 .collect { user ->
+                    updateEvents(user?.region?.regionCode ?: Region.COMMON.regionCode)
                     if (user != null) {
                         userInfo.value = user
                         sharedPreferencesUserInfo.value = userConverter.convertForSettings(user)
                         showProgressBar.value = false
                     } else {
-                       createUser(firebaseUser, providerType)
+                        createUser(firebaseUser, providerType)
                     }
                 }
         }

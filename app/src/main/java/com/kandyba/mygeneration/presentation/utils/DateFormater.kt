@@ -38,37 +38,37 @@ fun parseDateFromString(date: String): Calendar {
     }
 }
 
-fun addEventsToMap(events: List<Event>): HashMap<Calendar, MutableList<Event>> {
-    val map = HashMap<Calendar, MutableList<Event>>()
+fun addEventsToMap(events: List<Event>): HashMap<Long, MutableList<Event>> {
+    val map = HashMap<Long, MutableList<Event>>()
     for (event in events) {
-        event.day?.let {
-            val cal = parseDateFromString(event.day)
-            if (map.containsKey(cal)) {
-                map[cal]?.add(event)
-            } else {
-                map[cal] = mutableListOf(event)
-            }
+        val timeInMs = event.timestamp
+        if (map.containsKey(timeInMs)) {
+            map[timeInMs]?.add(event)
+        } else {
+            map[timeInMs] = mutableListOf(event)
         }
     }
     return map
 }
 
-fun parseDateFromCalendarDay(day: CalendarDay): Calendar {
+fun parseDateFromCalendarDay(day: CalendarDay): Long {
     return Calendar.getInstance().apply {
-        this.set(day.date.year, day.date.monthValue, day.day)
+        this.set(day.date.year, day.date.monthValue - 1, day.day)
+        this.set(Calendar.HOUR, 0)
         this.set(Calendar.HOUR_OF_DAY, 0)
         this.set(Calendar.MINUTE, 0)
         this.set(Calendar.MILLISECOND, 0)
         this.set(Calendar.SECOND, 0)
-    }
+        this.set(Calendar.ZONE_OFFSET, 0)
+    }.timeInMillis
 }
 
-fun Calendar.formatDateForUser() =
+fun Calendar.formatDateWithWords() =
     "${this[Calendar.DAY_OF_MONTH]} ${
         this.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     }"
 
-fun Calendar.formatDateForFirebase() =
+fun Calendar.formatDateWithDigits() =
     SimpleDateFormat(FIREBASE_FORMAT, Locale.getDefault()).format(Date(this.timeInMillis))
 
 const val FIREBASE_FORMAT = "dd.MM.yyyy"

@@ -4,10 +4,10 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Event(
-    val id: String?,
     val name: String?,
     val description: String?,
-    val day: String?,
+    val regionCode: String?,
+    val timestamp: Long = 0L,
     val startTime: String?,
     val finishTime: String?
 ): Parcelable {
@@ -16,20 +16,19 @@ data class Event(
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
-        parcel.readString(),
+        parcel.readLong(),
         parcel.readString(),
         parcel.readString()
     )
 
-    constructor(): this(null, null, null, null, null, null)
+    constructor() : this(null, null, null, 0L, null, null)
 
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeString(id)
         dest?.writeString(name)
         dest?.writeString(description)
-        dest?.writeString(day)
+        dest?.writeLong(timestamp)
         dest?.writeString(startTime)
         dest?.writeString(finishTime)
     }

@@ -12,7 +12,6 @@ import com.kandyba.mygeneration.models.presentation.SingleLiveEvent
 import com.kandyba.mygeneration.models.presentation.VkPost
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 
 class MainFragmentViewModel(
     private val wallRepository: WallRepository,
@@ -42,9 +41,10 @@ class MainFragmentViewModel(
 
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
 
-    fun init() {
+    fun init(regionCode: String) {
+        Log.i(TAG, eventsRepository.toString())
         viewModelScope.launch {
-            val eventsLoaded = async { loadEvents() }
+            val eventsLoaded = async { loadEvents(regionCode) }
             val vkPostsLoaded = async { loadVkPosts(false) }
             val regionsLoaded = async { loadRegions() }
             eventsLoaded.await()
@@ -54,9 +54,33 @@ class MainFragmentViewModel(
         }
     }
 
-    private suspend fun loadEvents() {
-        val events = eventsRepository.getEvents(CALENDAR_DATABASE_ENDPOINT)
-            .first()
+    fun openBottomFragment(fragment: DialogFragment) {
+        _openBottomSheet.value = fragment
+    }
+
+    fun addNewEvent(event: Event) {
+        viewModelScope.launch {
+            try {
+                val result = eventsRepository.addEvent(event)
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
+        }
+    }
+
+    fun getEvents(regionCode: String) {
+        viewModelScope.launch {
+            try {
+                _events.postValue(eventsRepository.getEvents(regionCode, 0))
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
+        }
+    }
+
+    private suspend fun loadEvents(regionCode: String) {
+        val events = eventsRepository.getEvents(regionCode, 0)
+        Log.i(TAG, events.toString())
         _events.postValue(events)
     }
 
@@ -84,13 +108,8 @@ class MainFragmentViewModel(
         regionsRepository.getRegions()
     }
 
-    fun openBottomFragment(fragment: DialogFragment) {
-        _openBottomSheet.value = fragment
-    }
-
     companion object {
         private const val TAG = "MainFragmentViewModel"
-        private const val CALENDAR_DATABASE_ENDPOINT = "calendar"
         private const val INITIAL_POSTS_COUNT = 100
     }
 }

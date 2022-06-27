@@ -26,7 +26,8 @@ enum class AccountType(val title: String) {
 
 enum class Region(val regionCode: String, val regionName: String) {
     MOSCOW("msk", "Москва"),
-    PITER("spb", "Санкт-Петербург")
+    PITER("spb", "Санкт-Петербург"),
+    COMMON("com", "")
 }
 
 enum class AuthType(val title: String) {
@@ -55,6 +56,7 @@ fun String.toRegion() =
     when (this) {
         Region.MOSCOW.regionCode -> Region.MOSCOW
         Region.PITER.regionCode -> Region.PITER
+        Region.COMMON.regionCode -> Region.COMMON
         else -> null
     }
 
@@ -62,5 +64,6 @@ fun String.toRegionCode() =
     when (this) {
         Region.MOSCOW.regionName -> Region.MOSCOW.regionCode
         Region.PITER.regionName -> Region.PITER.regionCode
+        Region.COMMON.regionName -> Region.COMMON.regionCode
         else -> EMPTY_STRING
     }

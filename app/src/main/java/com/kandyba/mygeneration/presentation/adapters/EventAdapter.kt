@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
+import com.kandyba.mygeneration.presentation.utils.formatDateWithDigits
+import java.util.*
 
 class EventAdapter(
     private var events: ArrayList<Event>
@@ -42,12 +44,13 @@ class EventAdapter(
         fun bindViews(event: Event) {
             name.text = event.name
             description.text = event.description
-            date.text = event.day
+            date.text = Calendar.getInstance().apply { timeInMillis = event.timestamp }
+                .formatDateWithDigits()
             val timeDisplayed = "${event.startTime} - ${event.finishTime}"
             time.text = timeDisplayed
             if (events.size > 1) {
                 eventNumber.visibility = View.VISIBLE
-                val number = "${events.indexOf(event)+1}."
+                val number = "${events.indexOf(event) + 1}."
                 eventNumber.text = number
             }
         }

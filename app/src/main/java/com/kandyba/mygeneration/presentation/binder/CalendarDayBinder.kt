@@ -16,10 +16,10 @@ import com.kizitonwose.calendarview.ui.DayBinder
 import java.util.*
 
 class CalendarDayBinder(
-    private val eventsMap: HashMap<Calendar, MutableList<Event>>,
+    private val eventsMap: HashMap<Long, MutableList<Event>>,
     private var context: Context?,
-    private val onEventDayClick: (List<Event>) -> Unit,
-    private val onEmptyDayClick: () -> Unit
+    private val onEventDayClick: (List<Event>, Long) -> Unit,
+    private val onEmptyDayClick: (Long) -> Unit
 ) : DayBinder<DayViewContainer> {
 
     private val today = Calendar.getInstance()
@@ -42,9 +42,9 @@ class CalendarDayBinder(
         }
         container.view.setOnClickListener {
             if (eventsMap.containsKey(date)) {
-                onEventDayClick.invoke(eventsMap.getOrDefault(date, mutableListOf()))
+                onEventDayClick.invoke(eventsMap.getOrDefault(date, mutableListOf()), date)
             } else {
-                onEmptyDayClick.invoke()
+                onEmptyDayClick.invoke(date)
             }
         }
     }
@@ -54,7 +54,7 @@ class CalendarDayBinder(
     }
 
     private fun setViewForEventDay(
-        date: Calendar,
+        date: Long,
         container: DayViewContainer,
         @DrawableRes background: Int
     ) {

@@ -1,6 +1,8 @@
 package com.kandyba.mygeneration.presentation.fragments
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,8 @@ import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.CalendarManager
 import com.kandyba.mygeneration.models.presentation.calendar.Event
+import com.kandyba.mygeneration.models.presentation.user.Region
+import com.kandyba.mygeneration.models.presentation.user.UserField
 import com.kandyba.mygeneration.presentation.adapters.PostsAdapter
 import com.kandyba.mygeneration.presentation.binder.CalendarDayBinder
 import com.kandyba.mygeneration.presentation.utils.addEventsToMap
@@ -32,6 +36,7 @@ class MainFragment : Fragment() {
 
     private lateinit var viewModel: MainFragmentViewModel
     private lateinit var calendarDayBinder: CalendarDayBinder
+    private lateinit var settings: SharedPreferences
     private var postsAdapter: PostsAdapter? = null
 
     override fun onCreateView(
@@ -50,16 +55,36 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val factory = (requireActivity().application as App).appComponent
+        val appComponent = (requireActivity().application as App).appComponent
+        val factory = appComponent
             .getMainFragmentViewModelFactory()
         viewModel = ViewModelProvider(requireActivity(), factory)
             .get(MainFragmentViewModel::class.java)
+        settings = appComponent.getSharedPreferences()
         initObservers()
-        viewModel.init()
+        viewModel.init(
+            settings.getString(
+                UserField.REGION_CODE.preferencesKey,
+                Region.COMMON.regionCode
+            ) ?: Region.COMMON.regionCode
+        )
     }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+        val defRegion = Region.COMMON.regionCode
+        viewModel.getEvents(
+            settings.getString(
+                UserField.REGION_CODE.preferencesKey, defRegion
+            ) ?: defRegion
+        )
+    }
+
 
     private fun initObservers() {
         viewModel.events.observe(requireActivity()) { events ->
+            Log.d(TAG, "initObservers() called with: events = $events")
             setCalendarDayBinder(events)
             setCalendarManager()
         }
@@ -80,8 +105,15 @@ class MainFragment : Fragment() {
     private fun setCalendarDayBinder(allEvents: List<Event>) {
         val map = addEventsToMap(allEvents)
         calendarDayBinder = CalendarDayBinder(map, requireContext(),
-            { events -> viewModel.openBottomFragment(BottomCalendarDialogFragment.newInstance(events)) },
-            { viewModel.openBottomFragment(AskAddEventDialogFragment.newInstance()) }
+            { events, time ->
+                viewModel.openBottomFragment(
+                    BottomCalendarDialogFragment.newInstance(
+                        events,
+                        time
+                    )
+                )
+            },
+            { time -> viewModel.openBottomFragment(AskAddEventDialogFragment.newInstance(time)) }
         )
         calendarView.dayBinder = calendarDayBinder
     }
@@ -92,6 +124,7 @@ class MainFragment : Fragment() {
     }
 
     companion object {
+        private const val TAG = "MainFragment"
         fun newInstance(): MainFragment {
             val args = Bundle()
 

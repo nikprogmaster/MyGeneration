@@ -9,5 +9,6 @@ enum class UserField(val preferencesKey: String) {
     PHONE("phoneNumber"),
     ID("id"),
     AUTH_TYPE("authType"),
-    REGION("region")
+    REGION_NAME("region_name"),
+    REGION_CODE("region_code")
 }

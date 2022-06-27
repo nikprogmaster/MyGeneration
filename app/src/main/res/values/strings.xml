@@ -39,4 +39,5 @@
     <string name="finish_time">Время конца</string>
     <string name="choose_date">Выберите дату</string>
     <string name="choose_time">Выберите время</string>
+    <string name="field_cannot_be_empty">Поле не должно быть пустым</string>
 </resources>

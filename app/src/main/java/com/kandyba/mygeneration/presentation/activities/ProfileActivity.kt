@@ -34,10 +34,7 @@ import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.data.RegionModel
 import com.kandyba.mygeneration.models.presentation.FileUtils
-import com.kandyba.mygeneration.models.presentation.user.AuthType
-import com.kandyba.mygeneration.models.presentation.user.User
-import com.kandyba.mygeneration.models.presentation.user.UserField
-import com.kandyba.mygeneration.models.presentation.user.toRegionCode
+import com.kandyba.mygeneration.models.presentation.user.*
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.animation.ProfileAnimation
 import com.kandyba.mygeneration.presentation.animation.show
@@ -251,7 +248,7 @@ class ProfileActivity : AppCompatActivity() {
             viewModel.addChangedField(UserField.BIRTHDAY, it.toString())
         }
         region.addTextChangedListener {
-            viewModel.addChangedField(UserField.REGION, it.toString().toRegionCode())
+            viewModel.addChangedField(UserField.REGION_NAME, it.toString().toRegionCode())
         }
     }
 
@@ -316,6 +313,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    //TODO: remove it to VM
     private fun signOut() {
         AuthUI.getInstance()
             .signOut(this)
@@ -323,6 +321,7 @@ class ProfileActivity : AppCompatActivity() {
                 showProgressBar(false)
                 showLoggedUserLayout(false)
                 clearSharedPreferences()
+                viewModel.updateEvents(Region.COMMON.regionCode, 0)
             }
     }
 
@@ -390,7 +389,7 @@ class ProfileActivity : AppCompatActivity() {
         birthday.setText(settings.getString(UserField.BIRTHDAY.preferencesKey, EMPTY_STRING))
         city.setText(settings.getString(UserField.CITY.preferencesKey, EMPTY_STRING))
         accountType.setText(settings.getString(UserField.ACCOUNT_TYPE.preferencesKey, EMPTY_STRING))
-        region.setText(settings.getString(UserField.REGION.preferencesKey, EMPTY_STRING))
+        region.setText(settings.getString(UserField.REGION_NAME.preferencesKey, EMPTY_STRING))
     }
 
     private fun showLoggedUserLayout(flag: Boolean) {

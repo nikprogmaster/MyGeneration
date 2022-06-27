@@ -12,7 +12,8 @@ class UserConverter {
             UserField.EMAIL to userModel.email,
             UserField.PHONE to userModel.phoneNumber,
             UserField.AUTH_TYPE to userModel.authType?.title,
-            UserField.REGION to userModel.region?.regionName
+            UserField.REGION_NAME to userModel.region?.regionName,
+            UserField.REGION_CODE to userModel.region?.regionCode
         )
     }
 }

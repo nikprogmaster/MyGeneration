@@ -48,7 +48,8 @@ class AskAddEventDialogFragment : DialogFragment() {
         addButton = root.findViewById(R.id.add)
         cancelButton = root.findViewById(R.id.cancel)
         addButton.setOnClickListener {
-            viewModel.openBottomFragment(AddEventBottomSheetFragment.newInstance())
+            val time = arguments?.getLong(TIME_IN_MS) ?: 0
+            viewModel.openBottomFragment(AddEventBottomSheetFragment.newInstance(time))
             dismiss()
         }
         cancelButton.setOnClickListener { dismiss() }
@@ -56,6 +57,9 @@ class AskAddEventDialogFragment : DialogFragment() {
     }
 
     companion object {
-        fun newInstance() = AskAddEventDialogFragment()
+        private const val TIME_IN_MS = "TIME"
+        fun newInstance(timeInMs: Long) = AskAddEventDialogFragment().apply {
+            arguments = Bundle().apply { putLong(TIME_IN_MS, timeInMs) }
+        }
     }
 }
