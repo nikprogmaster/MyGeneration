@@ -17,6 +17,7 @@ import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.CalendarManager
 import com.kandyba.mygeneration.models.presentation.calendar.Event
+import com.kandyba.mygeneration.models.presentation.user.AccountType
 import com.kandyba.mygeneration.models.presentation.user.Region
 import com.kandyba.mygeneration.models.presentation.user.UserField
 import com.kandyba.mygeneration.presentation.adapters.PostsAdapter
@@ -73,14 +74,16 @@ class MainFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() called")
-        val defRegion = Region.COMMON.regionCode
         viewModel.getEvents(
-            settings.getString(
-                UserField.REGION_CODE.preferencesKey, defRegion
-            ) ?: defRegion
+            settings.getString(UserField.REGION_CODE.preferencesKey, Region.COMMON.regionCode)
         )
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        calendarDayBinder.utilizeContext()
+    }
 
     private fun initObservers() {
         viewModel.events.observe(requireActivity()) { events ->
@@ -104,23 +107,24 @@ class MainFragment : Fragment() {
 
     private fun setCalendarDayBinder(allEvents: List<Event>) {
         val map = addEventsToMap(allEvents)
+        val hasRights = checkRightsToEditCalendar()
         calendarDayBinder = CalendarDayBinder(map, requireContext(),
             { events, time ->
                 viewModel.openBottomFragment(
-                    BottomCalendarDialogFragment.newInstance(
-                        events,
-                        time
-                    )
+                    BottomCalendarDialogFragment.newInstance(events, time, hasRights)
                 )
             },
-            { time -> viewModel.openBottomFragment(AskAddEventDialogFragment.newInstance(time)) }
+            { time ->
+                if (hasRights)
+                    viewModel.openBottomFragment(AskAddEventDialogFragment.newInstance(time))
+            }
         )
         calendarView.dayBinder = calendarDayBinder
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        calendarDayBinder.utilizeContext()
+    private fun checkRightsToEditCalendar(): Boolean {
+        val accountType = settings.getString(UserField.ACCOUNT_TYPE.preferencesKey, null)
+        return accountType != null && accountType == AccountType.MODERATOR.title
     }
 
     companion object {

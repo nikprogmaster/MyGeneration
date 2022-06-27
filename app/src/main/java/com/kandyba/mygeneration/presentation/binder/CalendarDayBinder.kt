@@ -30,15 +30,16 @@ class CalendarDayBinder(
         val date = parseDateFromCalendarDay(day)
         container.dayView.text = day.date.dayOfMonth.toString()
         if (day.owner == DayOwner.THIS_MONTH) {
-            setDefaultDaySettings(container)
-            setViewForEventDay(date, container, R.drawable.event_day_selector)
-            val fMonth = today.get(Calendar.MONTH) + 1
-            if (day.day == today.get(Calendar.DAY_OF_MONTH) && day.date.monthValue == fMonth) {
-                setDayBackground(container, R.drawable.today_selector)
-                setViewForEventDay(date, container, R.drawable.today_with_event_selector)
-            }
+            container.dayView.setTextColor(Color.BLACK)
         } else {
             container.dayView.setTextColor(Color.GRAY)
+        }
+        setDefaultDaySettings(container)
+        setViewForEventDay(date, container, R.drawable.event_day_selector)
+        val fMonth = today.get(Calendar.MONTH) + 1
+        if (day.day == today.get(Calendar.DAY_OF_MONTH) && day.date.monthValue == fMonth) {
+            setDayBackground(container, R.drawable.today_selector)
+            setViewForEventDay(date, container, R.drawable.today_with_event_selector)
         }
         container.view.setOnClickListener {
             if (eventsMap.containsKey(date)) {
@@ -74,7 +75,6 @@ class CalendarDayBinder(
             true
         )
         setDayBackground(container, typedValue.resourceId)
-        container.dayView.setTextColor(Color.BLACK)
     }
 
     private fun setDayBackground(container: DayViewContainer, @DrawableRes background: Int) {

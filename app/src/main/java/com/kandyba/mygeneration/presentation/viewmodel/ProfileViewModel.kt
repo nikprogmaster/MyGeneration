@@ -83,12 +83,10 @@ class ProfileViewModel(
         }
     }
 
-    fun updateEvents(regionCode: String, afterDate: Long = 0) {
-        Log.d(TAG, "updateEvents() called with: regionCode = $regionCode, afterDate = $afterDate")
+    fun updateEvents(regionCode: String) {
         viewModelScope.launch {
             try {
-                val e = eventsRepository.updateEvents(regionCode, afterDate)
-                Log.i(TAG, e.toString())
+                val e = eventsRepository.updateEvents(regionCode)
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
             }

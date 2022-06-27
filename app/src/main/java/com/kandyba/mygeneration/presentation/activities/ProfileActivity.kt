@@ -248,7 +248,7 @@ class ProfileActivity : AppCompatActivity() {
             viewModel.addChangedField(UserField.BIRTHDAY, it.toString())
         }
         region.addTextChangedListener {
-            viewModel.addChangedField(UserField.REGION_NAME, it.toString().toRegionCode())
+            viewModel.addChangedField(UserField.REGION_CODE, it.toString().toRegionCode())
         }
     }
 
@@ -321,7 +321,7 @@ class ProfileActivity : AppCompatActivity() {
                 showProgressBar(false)
                 showLoggedUserLayout(false)
                 clearSharedPreferences()
-                viewModel.updateEvents(Region.COMMON.regionCode, 0)
+                viewModel.updateEvents(Region.COMMON.regionCode)
             }
     }
 

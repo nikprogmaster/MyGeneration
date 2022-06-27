@@ -10,5 +10,5 @@ enum class UserField(val preferencesKey: String) {
     ID("id"),
     AUTH_TYPE("authType"),
     REGION_NAME("region_name"),
-    REGION_CODE("region_code")
+    REGION_CODE("region")
 }

@@ -11,6 +11,7 @@ import com.kandyba.mygeneration.data.repository.WallRepository
 import com.kandyba.mygeneration.models.presentation.SingleLiveEvent
 import com.kandyba.mygeneration.models.presentation.VkPost
 import com.kandyba.mygeneration.models.presentation.calendar.Event
+import com.kandyba.mygeneration.models.presentation.user.Region
 import kotlinx.coroutines.*
 
 class MainFragmentViewModel(
@@ -41,8 +42,10 @@ class MainFragmentViewModel(
 
     private val coroutineContext = SupervisorJob() + Dispatchers.IO
 
-    fun init(regionCode: String) {
-        Log.i(TAG, eventsRepository.toString())
+    private var regionCode: String = Region.COMMON.regionCode
+
+    fun init(code: String) {
+        regionCode = code
         viewModelScope.launch {
             val eventsLoaded = async { loadEvents(regionCode) }
             val vkPostsLoaded = async { loadVkPosts(false) }
@@ -62,16 +65,20 @@ class MainFragmentViewModel(
         viewModelScope.launch {
             try {
                 val result = eventsRepository.addEvent(event)
+                if (result) {
+                    _events.postValue(eventsRepository.updateEvents(regionCode))
+                }
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
             }
         }
     }
 
-    fun getEvents(regionCode: String) {
+    fun getEvents(code: String?) {
+        code?.let { regionCode = it }
         viewModelScope.launch {
             try {
-                _events.postValue(eventsRepository.getEvents(regionCode, 0))
+                _events.postValue(eventsRepository.getEvents(regionCode))
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
             }
@@ -79,7 +86,7 @@ class MainFragmentViewModel(
     }
 
     private suspend fun loadEvents(regionCode: String) {
-        val events = eventsRepository.getEvents(regionCode, 0)
+        val events = eventsRepository.getEvents(regionCode)
         Log.i(TAG, events.toString())
         _events.postValue(events)
     }

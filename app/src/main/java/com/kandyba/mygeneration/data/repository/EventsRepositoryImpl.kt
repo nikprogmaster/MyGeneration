@@ -6,31 +6,49 @@ import com.kandyba.mygeneration.data.EventsFirestoreSource
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class EventsRepositoryImpl(
     private val eventsFirestoreSource: EventsFirestoreSource,
     private val eventsCache: LruCache<String, List<Event>>
 ) : EventsRepository {
 
-    override suspend fun getEvents(regionCode: String, afterDate: Long): List<Event> =
+    private val startDate: Long
+
+    init {
+        val currentDate = Calendar.getInstance()
+        val year: Int = if (currentDate.get(Calendar.MONTH) < 7) {
+            currentDate.get(Calendar.YEAR) - 1
+        } else {
+            currentDate.get(Calendar.YEAR)
+        }
+        startDate = Calendar.getInstance().apply {
+            this.set(year, 7, 0)
+            this.set(Calendar.DAY_OF_MONTH, 1)
+            this.set(Calendar.HOUR, 0)
+            this.set(Calendar.HOUR_OF_DAY, 0)
+            this.set(Calendar.ZONE_OFFSET, 0)
+        }.timeInMillis
+        Log.i("EventsRepositoryImpl", startDate.toString())
+    }
+
+    override suspend fun getEvents(regionCode: String): List<Event> =
         withContext(Dispatchers.IO) {
             eventsCache.get(EVENTS_KEY) ?: eventsFirestoreSource.getEvents(
                 CALENDAR_DATABASE_ENDPOINT,
                 regionCode,
-                afterDate
+                startDate
             ).apply { eventsCache.put(EVENTS_KEY, this) }
         }
 
-    override suspend fun updateEvents(regionCode: String, afterDate: Long) {
+    override suspend fun updateEvents(regionCode: String): List<Event> =
         withContext(Dispatchers.IO) {
-            val e = eventsFirestoreSource.getEvents(
+            eventsFirestoreSource.getEvents(
                 CALENDAR_DATABASE_ENDPOINT,
                 regionCode,
-                afterDate
+                startDate
             ).apply { eventsCache.put(EVENTS_KEY, this) }
-            Log.i("EventsRepositoryImpl", e.toString())
         }
-    }
 
     override suspend fun addEvent(event: Event): Boolean =
         withContext(Dispatchers.IO) {

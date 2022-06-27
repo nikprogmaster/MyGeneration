@@ -1,7 +1,6 @@
 package com.kandyba.mygeneration.presentation.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,8 +36,8 @@ class BottomCalendarDialogFragment : BaseBottomSheetFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         rootView = inflater.inflate(R.layout.bottom_calendar_fragment, container, false)
         addEventButton = rootView.findViewById(R.id.add_event)
+        setAddButtonVisibility()
         addEventButton.setOnClickListener {
-            Log.i("BottomFragment", "clicked")
             viewModel.openBottomFragment(
                 AddEventBottomSheetFragment.newInstance(arguments?.getLong(TIME_IN_MS) ?: 0)
             )
@@ -65,16 +64,27 @@ class BottomCalendarDialogFragment : BaseBottomSheetFragment() {
         viewModel = ViewModelProvider(requireActivity(), factory)[MainFragmentViewModel::class.java]
     }
 
+    private fun setAddButtonVisibility() {
+        val visible = arguments?.getBoolean(SHOW_ADD_BUTTON) ?: false
+        addEventButton.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
 
     companion object {
         private const val EVENT_LIST = "events"
         private const val TIME_IN_MS = "TIME"
+        private const val SHOW_ADD_BUTTON = "SHOW_ADD_BUTTON"
 
-        fun newInstance(events: List<Event>, time_in_ms: Long): BottomCalendarDialogFragment {
+        fun newInstance(
+            events: List<Event>,
+            time_in_ms: Long,
+            showAddButton: Boolean
+        ): BottomCalendarDialogFragment {
             val fragment = BottomCalendarDialogFragment()
             val args = Bundle()
             args.putParcelableArrayList(EVENT_LIST, ArrayList(events))
             args.putLong(TIME_IN_MS, time_in_ms)
+            args.putBoolean(SHOW_ADD_BUTTON, showAddButton)
             fragment.arguments = args
             return fragment
         }

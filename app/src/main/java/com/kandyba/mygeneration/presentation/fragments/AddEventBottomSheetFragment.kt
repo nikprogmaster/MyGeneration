@@ -66,6 +66,7 @@ class AddEventBottomSheetFragment : BaseBottomSheetFragment() {
         if (timeInMs != 0L) {
             val date = Calendar.getInstance().apply { timeInMillis = timeInMs }
             eventDate.setText(date.formatDateWithWords())
+            timestamp = timeInMs
         }
 
     }

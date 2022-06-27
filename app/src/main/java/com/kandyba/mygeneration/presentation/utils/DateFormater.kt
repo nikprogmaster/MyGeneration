@@ -24,6 +24,14 @@ fun formatDate(month: Int): String =
         else -> EMPTY_STRING
     }
 
+fun formatTransitionDate(firstMonth: Int, secondMonth: Int): String {
+    return if (firstMonth == secondMonth) {
+        formatDate(firstMonth)
+    } else {
+        "${formatDate(firstMonth)} - ${formatDate(secondMonth)}"
+    }
+}
+
 fun parseDateFromString(date: String): Calendar {
     val calendar = Calendar.getInstance()
     return calendar.also {

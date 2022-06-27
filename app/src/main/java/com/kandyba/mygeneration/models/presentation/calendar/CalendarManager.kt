@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import com.kandyba.mygeneration.presentation.utils.formatDate
+import com.kandyba.mygeneration.presentation.utils.formatTransitionDate
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -112,8 +113,9 @@ class CalendarManager(
                 if (calendarView.maxRowCount == 6) {
                     monthTitle.text = formatDate(p1.yearMonth.month.value)
                 } else {
-                    val lastDate = p1.weekDays.last().last().date
-                    monthTitle.text = formatDate(lastDate.month.value)
+                    val firstDate = p1.weekDays.first().first().date.monthValue
+                    val lastDate = p1.weekDays.last().last().date.monthValue
+                    monthTitle.text = formatTransitionDate(firstDate, lastDate)
                 }
             }
         }

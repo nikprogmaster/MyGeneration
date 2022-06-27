@@ -54,6 +54,6 @@ class EventsFirestoreSource {
 
     companion object {
         private const val TIMESTAMP_FIELD = "timestamp"
-        private const val REGION_FIELD = "region"
+        private const val REGION_FIELD = "regionCode"
     }
 }
