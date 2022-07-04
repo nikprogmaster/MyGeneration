@@ -3,17 +3,14 @@ package com.kandyba.mygeneration.presentation.fragments
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.CalendarManager
 import com.kandyba.mygeneration.models.presentation.calendar.Event
@@ -22,11 +19,20 @@ import com.kandyba.mygeneration.models.presentation.user.Region
 import com.kandyba.mygeneration.models.presentation.user.UserField
 import com.kandyba.mygeneration.presentation.adapters.PostsAdapter
 import com.kandyba.mygeneration.presentation.binder.CalendarDayBinder
-import com.kandyba.mygeneration.presentation.utils.addEventsToMap
+import com.kandyba.mygeneration.presentation.utils.datetime.addEventsToMap
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
+import com.kandyba.mygeneration.presentation.viewmodel.ViewModelFactory
 import com.kizitonwose.calendarview.CalendarView
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-class MainFragment : Fragment() {
+class MainFragment : BaseFragment<MainFragmentViewModel>(R.layout.main_fragment) {
+
+    override val viewModelClass: Class<MainFragmentViewModel>
+        get() = MainFragmentViewModel::class.java
+
+    override val viewModelFactory: ViewModelFactory<MainFragmentViewModel>
+        get() = appComponent.getMainFragmentViewModelFactory()
 
     private lateinit var calendarView: CalendarView
     private lateinit var monthTitle: TextView
@@ -35,34 +41,21 @@ class MainFragment : Fragment() {
     private lateinit var calendarManager: CalendarManager
     private lateinit var postsRecyclerView: RecyclerView
 
-    private lateinit var viewModel: MainFragmentViewModel
     private lateinit var calendarDayBinder: CalendarDayBinder
     private lateinit var settings: SharedPreferences
     private var postsAdapter: PostsAdapter? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val root = inflater.inflate(R.layout.main_fragment, container, false)
+    override fun initFields(root: View) {
         calendarView = root.findViewById(R.id.calendar_view)
         monthTitle = root.findViewById(R.id.date_title)
         arrow = root.findViewById(R.id.month_arrow)
         titleLayout = root.findViewById(R.id.title_layout)
         postsRecyclerView = root.findViewById(R.id.posts_recycler)
-        return root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val appComponent = (requireActivity().application as App).appComponent
-        val factory = appComponent
-            .getMainFragmentViewModelFactory()
-        viewModel = ViewModelProvider(requireActivity(), factory)
-            .get(MainFragmentViewModel::class.java)
         settings = appComponent.getSharedPreferences()
-        initObservers()
         viewModel.init(
             settings.getString(
                 UserField.REGION_CODE.preferencesKey,
@@ -79,22 +72,26 @@ class MainFragment : Fragment() {
         )
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         calendarDayBinder.utilizeContext()
     }
 
-    private fun initObservers() {
-        viewModel.events.observe(requireActivity()) { events ->
-            Log.d(TAG, "initObservers() called with: events = $events")
-            setCalendarDayBinder(events)
+    override fun observeViewModel() {
+        super.observeViewModel()
+        viewModel.events.onEach {
+            setCalendarDayBinder(it)
             setCalendarManager()
-        }
-        viewModel.vkPosts.observe(requireActivity()) { posts ->
-            postsAdapter = PostsAdapter(posts)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.vkPosts.onEach {
+            postsAdapter = PostsAdapter(it)
             postsRecyclerView.adapter = postsAdapter
-        }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.openBottomSheet.observe(this, ::showDialog)
+    }
+
+    override fun showDialog(fragment: DialogFragment) {
+        fragment.show(childFragmentManager, null)
     }
 
     private fun setCalendarManager() {

@@ -1,4 +1,4 @@
-package com.kandyba.mygeneration.presentation.utils
+package com.kandyba.mygeneration.presentation.utils.datetime
 
 import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.presentation.calendar.Event
@@ -59,24 +59,24 @@ fun addEventsToMap(events: List<Event>): HashMap<Long, MutableList<Event>> {
     return map
 }
 
-fun parseDateFromCalendarDay(day: CalendarDay): Long {
-    return Calendar.getInstance().apply {
-        this.set(day.date.year, day.date.monthValue - 1, day.day)
-        this.set(Calendar.HOUR, 0)
-        this.set(Calendar.HOUR_OF_DAY, 0)
-        this.set(Calendar.MINUTE, 0)
-        this.set(Calendar.MILLISECOND, 0)
-        this.set(Calendar.SECOND, 0)
-        this.set(Calendar.ZONE_OFFSET, 0)
+internal fun CalendarDay.parseDateFromCalendarDay(): Long {
+    return Calendar.getInstance().also { calendar ->
+        calendar.set(this.date.year, this.date.monthValue - 1, this.day)
+        calendar.set(Calendar.HOUR, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.ZONE_OFFSET, 0)
     }.timeInMillis
 }
 
-fun Calendar.formatDateWithWords() =
+internal fun Calendar.formatDateWithWords() =
     "${this[Calendar.DAY_OF_MONTH]} ${
         this.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     }"
 
-fun Calendar.formatDateWithDigits() =
+internal fun Calendar.formatDateWithDigits() =
     SimpleDateFormat(FIREBASE_FORMAT, Locale.getDefault()).format(Date(this.timeInMillis))
 
 const val FIREBASE_FORMAT = "dd.MM.yyyy"

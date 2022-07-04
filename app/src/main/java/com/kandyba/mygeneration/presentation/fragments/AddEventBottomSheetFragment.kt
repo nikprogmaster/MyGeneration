@@ -2,27 +2,30 @@ package com.kandyba.mygeneration.presentation.fragments
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.models.presentation.user.Region
 import com.kandyba.mygeneration.models.presentation.user.UserField
-import com.kandyba.mygeneration.presentation.utils.formatDateWithWords
-import com.kandyba.mygeneration.presentation.utils.formatTime
+import com.kandyba.mygeneration.presentation.utils.datetime.formatDateWithWords
+import com.kandyba.mygeneration.presentation.utils.datetime.formatTime
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
+import com.kandyba.mygeneration.presentation.viewmodel.ViewModelFactory
 import java.util.*
 
-class AddEventBottomSheetFragment : BaseBottomSheetFragment() {
+class AddEventBottomSheetFragment :
+    BaseBottomSheetFragment<MainFragmentViewModel>(R.layout.add_event_bottom_fragment) {
+
+    override val viewModelClass: Class<MainFragmentViewModel>
+        get() = MainFragmentViewModel::class.java
+
+    override val viewModelFactory: ViewModelFactory<MainFragmentViewModel>
+        get() = appComponent.getMainFragmentViewModelFactory()
 
     private lateinit var eventName: EditText
     private lateinit var eventDescription: EditText
@@ -36,17 +39,9 @@ class AddEventBottomSheetFragment : BaseBottomSheetFragment() {
     private lateinit var finishTimePicker: MaterialTimePicker
     private lateinit var settings: SharedPreferences
 
-    private lateinit var viewModel: MainFragmentViewModel
-
     private var timestamp: Long = 0
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        val root = inflater.inflate(R.layout.add_event_bottom_fragment, container, false)
+    override fun initFields(root: View) {
         with(root) {
             eventName = findViewById(R.id.event_name)
             eventDescription = findViewById(R.id.event_description)
@@ -57,12 +52,10 @@ class AddEventBottomSheetFragment : BaseBottomSheetFragment() {
         }
         setDateValue()
         initListeners()
-        return root
     }
 
     private fun setDateValue() {
         val timeInMs = arguments?.getLong(TIME_IN_MS) ?: 0
-        Log.i("AddEventBottomSheetFragment", timeInMs.toString())
         if (timeInMs != 0L) {
             val date = Calendar.getInstance().apply { timeInMillis = timeInMs }
             eventDate.setText(date.formatDateWithWords())
@@ -73,11 +66,7 @@ class AddEventBottomSheetFragment : BaseBottomSheetFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val component = (requireActivity().application as App).appComponent
-        viewModel =
-            ViewModelProvider(requireActivity(), component.getMainFragmentViewModelFactory())
-                .get(MainFragmentViewModel::class.java)
-        settings = component.getSharedPreferences()
+        settings = appComponent.getSharedPreferences()
     }
 
     private fun initListeners() {
@@ -161,4 +150,5 @@ class AddEventBottomSheetFragment : BaseBottomSheetFragment() {
             arguments = Bundle().apply { putLong(TIME_IN_MS, timeInMs) }
         }
     }
+
 }

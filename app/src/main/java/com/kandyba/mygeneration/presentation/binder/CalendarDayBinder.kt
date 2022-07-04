@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.DayViewContainer
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import com.kandyba.mygeneration.presentation.utils.parseDateFromCalendarDay
+import com.kandyba.mygeneration.presentation.utils.datetime.parseDateFromCalendarDay
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
@@ -27,7 +27,7 @@ class CalendarDayBinder(
     override fun create(view: View) = DayViewContainer(view)
 
     override fun bind(container: DayViewContainer, day: CalendarDay) {
-        val date = parseDateFromCalendarDay(day)
+        val date = day.parseDateFromCalendarDay()
         container.dayView.text = day.date.dayOfMonth.toString()
         if (day.owner == DayOwner.THIS_MONTH) {
             container.dayView.setTextColor(Color.BLACK)

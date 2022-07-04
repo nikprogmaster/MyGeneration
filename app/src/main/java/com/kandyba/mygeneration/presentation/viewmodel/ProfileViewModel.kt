@@ -17,8 +17,6 @@ import com.kandyba.mygeneration.models.presentation.user.Region
 import com.kandyba.mygeneration.models.presentation.user.User
 import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -84,22 +82,14 @@ class ProfileViewModel(
     }
 
     fun updateEvents(regionCode: String) {
-        viewModelScope.launch {
-            try {
-                val e = eventsRepository.updateEvents(regionCode)
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
-            }
+        viewModelScope.launch(context) {
+            eventsRepository.updateEvents(regionCode)
         }
     }
 
     private fun loadRegions() {
-        viewModelScope.launch {
-            try {
-                regions.postValue(regionsRepository.getRegions())
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
-            }
+        viewModelScope.launch(context) {
+            regions.postValue(regionsRepository.getRegions())
         }
     }
 
@@ -113,9 +103,8 @@ class ProfileViewModel(
 
     fun successfullySigned(firebaseUser: FirebaseUser, providerType: String? = null) {
         showLoggedUserLayout.value = true
-        viewModelScope.launch {
+        viewModelScope.launch(context) {
             userRepository.getUserInfo(firebaseUser.uid)
-                .catch { Log.e(TAG, it.message.toString()) }
                 .collect { user ->
                     updateEvents(user?.region?.regionCode ?: Region.COMMON.regionCode)
                     if (user != null) {
@@ -146,7 +135,7 @@ class ProfileViewModel(
     }
 
     fun changeUserAvatar(file: File?, id: String?) {
-        viewModelScope.launch {
+        viewModelScope.launch(context) {
             userRepository.uploadUserAvatar(file, id)
                 ?.addOnSuccessListener { }
                 ?.addOnFailureListener { }
@@ -154,29 +143,15 @@ class ProfileViewModel(
     }
 
     private fun createUser(firebaseUser: FirebaseUser, providerType: String? = null) {
-        viewModelScope.launch {
-            try {
-                // if result is false, notify user that changing info failed
-                val result = userRepository.createUser(firebaseUser, providerType)
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
-            }
+        viewModelScope.launch(context) {
+            userRepository.createUser(firebaseUser, providerType)
         }
     }
 
     private fun changeUserField(endpoint: String, value: String) {
-        viewModelScope.launch {
-            try {
-                // if result is false, notify user that changing info failed
-                val result = auth.currentUser?.uid?.let {
-                    userRepository.changeUserInfo(
-                        value,
-                        endpoint,
-                        it
-                    )
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
+        viewModelScope.launch(context) {
+            auth.currentUser?.uid?.let {
+                userRepository.changeUserInfo(value, endpoint, it)
             }
         }
     }

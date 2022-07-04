@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import com.kandyba.mygeneration.presentation.utils.formatDateWithDigits
+import com.kandyba.mygeneration.presentation.utils.datetime.formatDateWithDigits
 import java.util.*
 
 class EventAdapter(

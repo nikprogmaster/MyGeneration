@@ -110,6 +110,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.1.0'
 
+    //Fragment lifecycle
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
+
     //Coroutine Testing
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
 

@@ -13,6 +13,8 @@ import com.kandyba.mygeneration.models.presentation.VkPost
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.models.presentation.user.Region
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class MainFragmentViewModel(
     private val wallRepository: WallRepository,
@@ -22,16 +24,16 @@ class MainFragmentViewModel(
 
     private var postCount = INITIAL_POSTS_COUNT
 
-    private val _events = MutableLiveData<List<Event>>()
     private val _openBottomSheet = SingleLiveEvent<DialogFragment>()
-    private val _vkPosts = MutableLiveData<List<VkPost>>()
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    private val _vkPosts = MutableStateFlow<List<VkPost>>(emptyList())
     private val _allDataLoaded = MutableLiveData<Unit>()
 
-    val events: LiveData<List<Event>>
-        get() = _events
     val openBottomSheet: LiveData<DialogFragment>
         get() = _openBottomSheet
-    val vkPosts: LiveData<List<VkPost>>
+    val events: StateFlow<List<Event>>
+        get() = _events
+    val vkPosts: StateFlow<List<VkPost>>
         get() = _vkPosts
     val allDataLoaded: LiveData<Unit>
         get() = _allDataLoaded
@@ -40,19 +42,15 @@ class MainFragmentViewModel(
     val scope =
         CoroutineScope(Job() + Dispatchers.IO + Dispatchers.Main + CoroutineName("My coroutine"))
 
-    private val coroutineContext = SupervisorJob() + Dispatchers.IO
-
     private var regionCode: String = Region.COMMON.regionCode
 
     fun init(code: String) {
         regionCode = code
         viewModelScope.launch {
-            val eventsLoaded = async { loadEvents(regionCode) }
-            val vkPostsLoaded = async { loadVkPosts(false) }
-            val regionsLoaded = async { loadRegions() }
-            eventsLoaded.await()
-            vkPostsLoaded.await()
-            regionsLoaded.await()
+            val eventsLoaded = launch(context) { loadEvents(regionCode) }
+            val vkPostsLoaded = launch(context) { loadVkPosts(false) }
+            val regionsLoaded = launch(context) { loadRegions() }
+            joinAll(eventsLoaded, vkPostsLoaded, regionsLoaded)
             _allDataLoaded.postValue(Unit)
         }
     }
@@ -62,7 +60,7 @@ class MainFragmentViewModel(
     }
 
     fun addNewEvent(event: Event) {
-        viewModelScope.launch {
+        viewModelScope.launch(context) {
             try {
                 val result = eventsRepository.addEvent(event)
                 if (result) {
@@ -76,12 +74,8 @@ class MainFragmentViewModel(
 
     fun getEvents(code: String?) {
         code?.let { regionCode = it }
-        viewModelScope.launch {
-            try {
-                _events.postValue(eventsRepository.getEvents(regionCode))
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
-            }
+        viewModelScope.launch(context) {
+            _events.postValue(eventsRepository.getEvents(regionCode))
         }
     }
 
@@ -100,12 +94,8 @@ class MainFragmentViewModel(
         //supervisorScope {  }
 
         // При запуске с помощью launch { } исключения появляются сразу
-        try {
-            val result = wallRepository.getWallPosts(postCount)
-            _vkPosts.postValue(result)
-        } catch (e: Exception) {
-            Log.e(TAG, e.message.toString())
-        }
+        val result = wallRepository.getWallPosts(postCount)
+        _vkPosts.postValue(result)
 
         // При запуске с помощью async{} исключения появляются только при вызове метода await()
         // scope.async {  }

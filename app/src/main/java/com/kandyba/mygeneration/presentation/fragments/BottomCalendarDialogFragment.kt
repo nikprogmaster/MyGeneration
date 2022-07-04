@@ -1,23 +1,27 @@
 package com.kandyba.mygeneration.presentation.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.get
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.presentation.adapters.EventAdapter
 import com.kandyba.mygeneration.presentation.viewmodel.MainFragmentViewModel
+import com.kandyba.mygeneration.presentation.viewmodel.ViewModelFactory
 
 
-class BottomCalendarDialogFragment : BaseBottomSheetFragment() {
+class BottomCalendarDialogFragment :
+    BaseBottomSheetFragment<MainFragmentViewModel>(R.layout.bottom_calendar_fragment) {
+
+    override val viewModelClass: Class<MainFragmentViewModel>
+        get() = MainFragmentViewModel::class.java
+
+    override val viewModelFactory: ViewModelFactory<MainFragmentViewModel>
+        get() = appComponent.getMainFragmentViewModelFactory()
 
     private lateinit var eventsRecyclerView: RecyclerView
     private lateinit var eventsAdapter: EventAdapter
@@ -26,15 +30,7 @@ class BottomCalendarDialogFragment : BaseBottomSheetFragment() {
 
     private var eventsList: ArrayList<Event> = ArrayList()
 
-    private lateinit var viewModel: MainFragmentViewModel
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        rootView = inflater.inflate(R.layout.bottom_calendar_fragment, container, false)
+    override fun initFields(root: View) {
         addEventButton = rootView.findViewById(R.id.add_event)
         setAddButtonVisibility()
         addEventButton.setOnClickListener {
@@ -53,22 +49,12 @@ class BottomCalendarDialogFragment : BaseBottomSheetFragment() {
             val div = rootView.findViewById<ImageView>(R.id.stick)
             bottomSheetBehavior.peekHeight = eventsRecyclerView[0].height + div.height
         }
-
-        return rootView
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val factory = (requireActivity().application as App).appComponent
-            .getMainFragmentViewModelFactory()
-        viewModel = ViewModelProvider(requireActivity(), factory)[MainFragmentViewModel::class.java]
     }
 
     private fun setAddButtonVisibility() {
         val visible = arguments?.getBoolean(SHOW_ADD_BUTTON) ?: false
         addEventButton.visibility = if (visible) View.VISIBLE else View.GONE
     }
-
 
     companion object {
         private const val EVENT_LIST = "events"

@@ -7,8 +7,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
-import com.kandyba.mygeneration.presentation.utils.formatDate
-import com.kandyba.mygeneration.presentation.utils.formatTransitionDate
+import com.kandyba.mygeneration.presentation.utils.datetime.formatDate
+import com.kandyba.mygeneration.presentation.utils.datetime.formatTransitionDate
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle

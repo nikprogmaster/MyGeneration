@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -67,7 +66,6 @@ class MainActivity : AppCompatActivity() {
             animatorsList = animationHelper.setAnimation(logo, animationListener)
             animationHelper.showAnimation(animatorsList, false)
         }
-        mainFragmentViewModel.openBottomSheet.observe(this, ::openBottomSheetFragment)
     }
 
     private fun initViews() {
@@ -124,9 +122,5 @@ class MainActivity : AppCompatActivity() {
     private fun launchProfile(unit: Unit) {
         val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
-    }
-
-    private fun openBottomSheetFragment(fragment: DialogFragment) {
-        fragment.show(supportFragmentManager, null)
     }
 }
