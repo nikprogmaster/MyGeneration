@@ -1,4 +1,7 @@
-package com.kandyba.mygeneration.models.presentation.user
+package com.kandyba.mygeneration.presentation.utils
+
+import com.kandyba.mygeneration.models.presentation.user.User
+import com.kandyba.mygeneration.models.presentation.user.UserField
 
 class UserConverter {
 

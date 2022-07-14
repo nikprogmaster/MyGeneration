@@ -1,6 +1,5 @@
 package com.kandyba.mygeneration.presentation.viewmodel
 
-import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,6 +15,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * [BaseViewModel] главного экрана
+ *
+ * @param wallRepository репозиторий новостей из группы вк
+ * @param eventsRepository репозиторий событий в календаре
+ * @param regionsRepository репозиторий регионов
+ */
 class MainFragmentViewModel(
     private val wallRepository: WallRepository,
     private val eventsRepository: EventsRepository,
@@ -29,12 +35,19 @@ class MainFragmentViewModel(
     private val _vkPosts = MutableStateFlow<List<VkPost>>(emptyList())
     private val _allDataLoaded = MutableLiveData<Unit>()
 
+    /** [LiveData] для открытия [DialogFragment] */
     val openBottomSheet: LiveData<DialogFragment>
         get() = _openBottomSheet
+
+    /** [StateFlow] для получения событий */
     val events: StateFlow<List<Event>>
         get() = _events
+
+    /** [StateFlow] для получения постов вк */
     val vkPosts: StateFlow<List<VkPost>>
         get() = _vkPosts
+
+    /** [LiveData] для информирования о том, что все данные для старта приложения загружены */
     val allDataLoaded: LiveData<Unit>
         get() = _allDataLoaded
 
@@ -44,6 +57,11 @@ class MainFragmentViewModel(
 
     private var regionCode: String = Region.COMMON.regionCode
 
+    /**
+     * Иницировать зазрузку данных
+     *
+     * @param code код региона
+     */
     fun init(code: String) {
         regionCode = code
         viewModelScope.launch {
@@ -55,34 +73,43 @@ class MainFragmentViewModel(
         }
     }
 
+    /**
+     * Открыть нижнюю шторку
+     *
+     * @param fragment диалоговый фрагмент
+     */
     fun openBottomFragment(fragment: DialogFragment) {
         _openBottomSheet.value = fragment
     }
 
+    /**
+     * Добавить новое событие
+     *
+     * @param event событие
+     */
     fun addNewEvent(event: Event) {
         viewModelScope.launch(context) {
-            try {
-                val result = eventsRepository.addEvent(event)
-                if (result) {
-                    _events.postValue(eventsRepository.updateEvents(regionCode))
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
+            val result = eventsRepository.addEvent(event)
+            if (result) {
+                _events.value = eventsRepository.updateEvents(regionCode)
             }
         }
     }
 
+    /**
+     * Загрузить события
+     *
+     * @param code код региона
+     */
     fun getEvents(code: String?) {
         code?.let { regionCode = it }
         viewModelScope.launch(context) {
-            _events.postValue(eventsRepository.getEvents(regionCode))
+            _events.value = eventsRepository.getEvents(regionCode)
         }
     }
 
     private suspend fun loadEvents(regionCode: String) {
-        val events = eventsRepository.getEvents(regionCode)
-        Log.i(TAG, events.toString())
-        _events.postValue(events)
+        _events.value = eventsRepository.getEvents(regionCode)
     }
 
     private suspend fun loadVkPosts(double: Boolean) {
@@ -95,7 +122,7 @@ class MainFragmentViewModel(
 
         // При запуске с помощью launch { } исключения появляются сразу
         val result = wallRepository.getWallPosts(postCount)
-        _vkPosts.postValue(result)
+        _vkPosts.value = result
 
         // При запуске с помощью async{} исключения появляются только при вызове метода await()
         // scope.async {  }

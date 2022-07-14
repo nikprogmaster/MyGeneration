@@ -10,14 +10,13 @@ import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.presentation.utils.datetime.formatDateWithDigits
 import java.util.*
 
-class EventAdapter(
-    private var events: ArrayList<Event>
-    ): RecyclerView.Adapter<EventAdapter.EventHolder>() {
-
-    fun setEventsList(events: ArrayList<Event>) {
-        this.events = events
-        notifyDataSetChanged()
-    }
+/**
+ * Адаптер для списка событий
+ *
+ * @param events список событий
+ */
+class EventAdapter(private val events: ArrayList<Event>) :
+    RecyclerView.Adapter<EventAdapter.EventHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.event_item, parent, false)
@@ -33,6 +32,11 @@ class EventAdapter(
         return events.size
     }
 
+    /**
+     * ViewHolder для ячейки события
+     *
+     * @param itemView корневая вью элемента
+     */
     inner class EventHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val name: TextView = itemView.findViewById(R.id.event_title)
@@ -41,10 +45,16 @@ class EventAdapter(
         private val date: TextView = itemView.findViewById(R.id.date)
         private val eventNumber: TextView = itemView.findViewById(R.id.event_number)
 
+        /**
+         * Забиндить вью
+         *
+         * @param event событие
+         */
         fun bindViews(event: Event) {
             name.text = event.name
             description.text = event.description
-            date.text = Calendar.getInstance().apply { timeInMillis = event.timestamp }
+            date.text = Calendar.getInstance()
+                .apply { timeInMillis = event.timestamp }
                 .formatDateWithDigits()
             val timeDisplayed = "${event.startTime} - ${event.finishTime}"
             time.text = timeDisplayed

@@ -1,4 +1,4 @@
-package com.kandyba.mygeneration.models.presentation.calendar
+package com.kandyba.mygeneration.presentation.view
 
 import android.animation.ValueAnimator
 import android.graphics.drawable.Drawable
@@ -7,8 +7,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
-import com.kandyba.mygeneration.presentation.utils.datetime.formatDate
 import com.kandyba.mygeneration.presentation.utils.datetime.formatTransitionDate
+import com.kandyba.mygeneration.presentation.utils.datetime.getMonthByNumber
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -111,7 +111,7 @@ class CalendarManager(
         calendarView.monthScrollListener = object : MonthScrollListener {
             override fun invoke(p1: CalendarMonth) {
                 if (calendarView.maxRowCount == 6) {
-                    monthTitle.text = formatDate(p1.yearMonth.month.value)
+                    monthTitle.text = getMonthByNumber(p1.yearMonth.month.value)
                 } else {
                     val firstDate = p1.weekDays.first().first().date.monthValue
                     val lastDate = p1.weekDays.last().last().date.monthValue

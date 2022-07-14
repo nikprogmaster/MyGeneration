@@ -33,11 +33,11 @@ import com.kandyba.mygeneration.App
 import com.kandyba.mygeneration.R
 import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.data.RegionModel
-import com.kandyba.mygeneration.models.presentation.FileUtils
 import com.kandyba.mygeneration.models.presentation.user.*
 import com.kandyba.mygeneration.presentation.animation.AnimationListener
 import com.kandyba.mygeneration.presentation.animation.ProfileAnimation
 import com.kandyba.mygeneration.presentation.animation.show
+import com.kandyba.mygeneration.presentation.utils.FileUtils
 import com.kandyba.mygeneration.presentation.viewmodel.ProfileViewModel
 import java.io.File
 
@@ -102,7 +102,6 @@ class ProfileActivity : AppCompatActivity() {
             avatar.setImageURI(selectedImage)
 
             val file = FileUtils.getPath(this, selectedImage)
-            Log.i("selectedImage", data?.dataString.toString())
             viewModel.changeUserAvatar(
                 File(file),
                 settings.getString(UserField.ID.preferencesKey, null)
@@ -213,11 +212,9 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun setMenuToRegion(regions: List<RegionModel>) {
         regionMenu = PopupMenu(this, region)
-        regionMenu?.let {
-            for (r in regions) {
-                it.menu.add(r.name)
-            }
-            it.setOnMenuItemClickListener { item ->
+        regionMenu?.let { menu ->
+            regions.forEach { menu.menu.add(it.name) }
+            menu.setOnMenuItemClickListener { item ->
                 region.setText(item.title)
                 true
             }
@@ -341,8 +338,9 @@ class ProfileActivity : AppCompatActivity() {
         city.isEnabled = flag
         region.isEnabled = flag
         if (flag) {
-            when (settings.getString(UserField.AUTH_TYPE.preferencesKey, EMPTY_STRING)
-                ?: EMPTY_STRING) {
+            val authType = settings.getString(UserField.AUTH_TYPE.preferencesKey, EMPTY_STRING)
+                ?: EMPTY_STRING
+            when (authType) {
                 AuthType.GOOGLE.title, AuthType.EMAIL.title -> login.isEnabled = false
                 AuthType.PHONE.title -> phone.isEnabled = false
             }
@@ -370,9 +368,6 @@ class ProfileActivity : AppCompatActivity() {
         accountType.setText(userModel.accountType?.title)
         city.setText(userModel.city)
         region.setText(userModel.region?.regionName)
-
-        //TODO: Нужно понять, как по uri фотку сетать!!!
-        //avatar.setImageResource(user.photoUrl)
     }
 
     private fun clearSharedPreferences() {

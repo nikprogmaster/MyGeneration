@@ -7,9 +7,9 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.kandyba.mygeneration.R
-import com.kandyba.mygeneration.models.presentation.calendar.DayViewContainer
 import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.presentation.utils.datetime.parseDateFromCalendarDay
+import com.kandyba.mygeneration.presentation.view.DayViewContainer
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
@@ -22,17 +22,18 @@ class CalendarDayBinder(
     private val onEmptyDayClick: (Long) -> Unit
 ) : DayBinder<DayViewContainer> {
 
-    private val today = Calendar.getInstance()
+    private val today: Calendar
+        get() = Calendar.getInstance()
 
     override fun create(view: View) = DayViewContainer(view)
 
     override fun bind(container: DayViewContainer, day: CalendarDay) {
         val date = day.parseDateFromCalendarDay()
-        container.dayView.text = day.date.dayOfMonth.toString()
+        container.setText(day.date.dayOfMonth.toString())
         if (day.owner == DayOwner.THIS_MONTH) {
-            container.dayView.setTextColor(Color.BLACK)
+            container.setTextColor(Color.BLACK)
         } else {
-            container.dayView.setTextColor(Color.GRAY)
+            container.setTextColor(Color.GRAY)
         }
         setDefaultDaySettings(container)
         setViewForEventDay(date, container, R.drawable.event_day_selector)
@@ -61,8 +62,8 @@ class CalendarDayBinder(
     ) {
         if (eventsMap.containsKey(date)) {
             context?.let {
-                container.dayView.background = ContextCompat.getDrawable(it, background)
-                container.dayView.setTextColor(it.getColor(R.color.colorPrimary))
+                container.setBackground(ContextCompat.getDrawable(it, background))
+                container.setTextColor(it.getColor(R.color.colorPrimary))
             }
         }
     }
@@ -78,6 +79,6 @@ class CalendarDayBinder(
     }
 
     private fun setDayBackground(container: DayViewContainer, @DrawableRes background: Int) {
-        container.dayView.background = context?.let { ContextCompat.getDrawable(it, background) }
+        container.setBackground(context?.let { ContextCompat.getDrawable(it, background) })
     }
 }

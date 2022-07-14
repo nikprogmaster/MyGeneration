@@ -1,7 +1,6 @@
 package com.kandyba.mygeneration.presentation.viewmodel
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -15,8 +14,8 @@ import com.kandyba.mygeneration.models.EMPTY_STRING
 import com.kandyba.mygeneration.models.data.RegionModel
 import com.kandyba.mygeneration.models.presentation.user.Region
 import com.kandyba.mygeneration.models.presentation.user.User
-import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.models.presentation.user.UserField
+import com.kandyba.mygeneration.presentation.utils.UserConverter
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -67,7 +66,6 @@ class ProfileViewModel(
         get() = regions
 
     fun init(prefs: SharedPreferences) {
-        Log.i(TAG, eventsRepository.toString())
         loadRegions()
         auth = FirebaseAuth.getInstance()
         settings = prefs

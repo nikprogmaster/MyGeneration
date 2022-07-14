@@ -3,12 +3,12 @@ package com.kandyba.mygeneration.presentation.utils.coroutines.exceptionhandlers
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.coroutines.CoroutineContext
 
-internal class AggregationExceptionHandler(
+class AggregationExceptionHandler(
     private val handlerList: List<HandlerWithChecker>,
     private val defaultHandler: CoroutineExceptionHandler
 ) : BaseCoroutineExceptionHandler() {
 
-    internal data class HandlerWithChecker(
+    data class HandlerWithChecker(
         val checker: (Throwable) -> Boolean,
         val handler: CoroutineExceptionHandler
     )

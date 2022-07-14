@@ -1,4 +1,4 @@
-package com.kandyba.mygeneration.data
+package com.kandyba.mygeneration.data.source
 
 import android.util.Log
 import com.google.firebase.database.*
@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class EventsDatadaseSource() {
+class EventsDatabaseSource {
     fun getUserEvents(calendarEndpoint: String): Flow<List<Event>> = callbackFlow {
 
         var eventsCollection: DatabaseReference? = null
@@ -34,7 +34,7 @@ class EventsDatadaseSource() {
                         eventList.add(event)
                 }
                 try {
-                    offer(eventList)
+                    trySend(eventList)
                 } catch (e: Throwable) {
                     Log.e(OFFER_ERROR, e.message.toString())
                 }

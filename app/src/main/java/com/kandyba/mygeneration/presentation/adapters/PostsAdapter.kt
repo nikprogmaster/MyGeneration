@@ -13,7 +13,7 @@ import com.kandyba.mygeneration.models.presentation.VkPost
 import com.smarteist.autoimageslider.SliderView
 
 class PostsAdapter(
-    private var postsList: List<VkPost>
+    private val postsList: List<VkPost>
 ) : RecyclerView.Adapter<PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {

@@ -1,4 +1,4 @@
-package com.kandyba.mygeneration.data
+package com.kandyba.mygeneration.data.source
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -9,7 +9,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class EventsFirestoreSource {
+class EventsFirestoreSource : EventsSource {
 
     private val firestore: FirebaseFirestore?
         get() = try {
@@ -18,7 +18,11 @@ class EventsFirestoreSource {
             null
         }
 
-    suspend fun getEvents(eventsEndpoint: String, regionCode: String, dateInMs: Long): List<Event> =
+    override suspend fun getEvents(
+        eventsEndpoint: String,
+        regionCode: String,
+        dateInMs: Long
+    ): List<Event> =
         suspendCoroutine { continuation ->
             val regions = mutableListOf(regionCode)
             if (regionCode != Region.COMMON.regionCode) {
@@ -38,7 +42,7 @@ class EventsFirestoreSource {
             }
         }
 
-    suspend fun addNewEvent(eventsEndpoint: String, event: Event): Boolean =
+    override suspend fun addNewEvent(eventsEndpoint: String, event: Event): Boolean =
         suspendCoroutine { continuation ->
             firestore?.let {
                 it.collection(eventsEndpoint)

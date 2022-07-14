@@ -10,7 +10,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -59,9 +58,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun initObservers() {
         appViewModel.launchProfileLiveData.observe(this, ::launchProfile)
-        appViewModel.openMainFragmentLiveData.observe(this, Observer {
+        appViewModel.openMainFragmentLiveData.observe(this) {
             openFragment(MainFragment.newInstance())
-        })
+        }
         mainFragmentViewModel.allDataLoaded.observe(this) {
             animatorsList = animationHelper.setAnimation(logo, animationListener)
             animationHelper.showAnimation(animatorsList, false)

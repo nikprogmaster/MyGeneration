@@ -1,4 +1,4 @@
-package com.kandyba.mygeneration.data
+package com.kandyba.mygeneration.data.source
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -8,7 +8,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class RegionFirestoreSource {
+class RegionsFirestoreSource : RegionsSource {
 
     private val firestore: FirebaseFirestore?
         get() = try {
@@ -17,7 +17,7 @@ class RegionFirestoreSource {
             null
         }
 
-    suspend fun getRegions(regionEndpoint: String): List<RegionModel> =
+    override suspend fun getRegions(regionEndpoint: String): List<RegionModel> =
         suspendCoroutine { continuation ->
             firestore?.let {
                 it.collection(regionEndpoint)

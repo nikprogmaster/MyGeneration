@@ -2,9 +2,9 @@ package com.kandyba.mygeneration.di
 
 import android.content.SharedPreferences
 import com.kandyba.mygeneration.data.WallApiMapper
-import com.kandyba.mygeneration.models.presentation.user.UserConverter
 import com.kandyba.mygeneration.presentation.animation.AnimationHelper
 import com.kandyba.mygeneration.presentation.animation.ProfileAnimation
+import com.kandyba.mygeneration.presentation.utils.UserConverter
 import com.kandyba.mygeneration.presentation.viewmodel.*
 
 interface AppApi {

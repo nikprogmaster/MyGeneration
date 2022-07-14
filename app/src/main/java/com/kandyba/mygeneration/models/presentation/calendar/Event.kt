@@ -3,6 +3,16 @@ package com.kandyba.mygeneration.models.presentation.calendar
 import android.os.Parcel
 import android.os.Parcelable
 
+/**
+ * Событие в календаре
+ *
+ * @property name название
+ * @property description описание события
+ * @property regionCode код региона
+ * @property timestamp дата события в формате timestamp (мс)
+ * @property startTime время начала
+ * @property finishTime время конца
+ */
 data class Event(
     val name: String?,
     val description: String?,

@@ -1,13 +1,13 @@
 package com.kandyba.mygeneration.di
 
 import androidx.collection.LruCache
-import com.kandyba.mygeneration.data.EventsFirestoreSource
-import com.kandyba.mygeneration.data.RegionFirestoreSource
-import com.kandyba.mygeneration.data.UserDatabaseSource
 import com.kandyba.mygeneration.data.WallApiMapper
 import com.kandyba.mygeneration.data.repository.*
+import com.kandyba.mygeneration.data.source.EventsFirestoreSource
+import com.kandyba.mygeneration.data.source.RegionsFirestoreSource
+import com.kandyba.mygeneration.data.source.UserDatabaseSource
 import com.kandyba.mygeneration.models.presentation.calendar.Event
-import com.kandyba.mygeneration.models.presentation.user.UserConverter
+import com.kandyba.mygeneration.presentation.utils.UserConverter
 import com.kandyba.mygeneration.presentation.viewmodel.*
 import dagger.Module
 import dagger.Provides
@@ -30,7 +30,7 @@ class ViewModelModule {
             ProfileViewModel(
                 userConverter,
                 UserRepositoryImpl(UserDatabaseSource()),
-                RegionsRepositoryImpl(RegionFirestoreSource()),
+                RegionsRepositoryImpl(RegionsFirestoreSource()),
                 eventsRepository
             )
         }
@@ -44,7 +44,7 @@ class ViewModelModule {
             MainFragmentViewModel(
                 WallRepositoryImpl(apiMapper),
                 eventsRepository,
-                RegionsRepositoryImpl(RegionFirestoreSource())
+                RegionsRepositoryImpl(RegionsFirestoreSource())
             )
         }
 

@@ -1,13 +1,18 @@
 package com.kandyba.mygeneration.presentation.utils.datetime
 
 import com.kandyba.mygeneration.models.EMPTY_STRING
-import com.kandyba.mygeneration.models.presentation.calendar.Event
 import com.kandyba.mygeneration.models.presentation.calendar.Month
 import com.kizitonwose.calendarview.model.CalendarDay
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun formatDate(month: Int): String =
+/**
+ * Получить из числа название месяца
+ *
+ * @param month номер месяца
+ * @return название месяца
+ */
+fun getMonthByNumber(month: Int): String =
     when (month) {
         1 -> Month.JANUARY.monthName
         2 -> Month.FEBRUARY.monthName
@@ -24,14 +29,27 @@ fun formatDate(month: Int): String =
         else -> EMPTY_STRING
     }
 
+/**
+ * Отформатировать переходную дату
+ *
+ * @param firstMonth первый месяц
+ * @param secondMonth второй месяц
+ * @return "месяц1" или "месяц1 - месяц2"
+ */
 fun formatTransitionDate(firstMonth: Int, secondMonth: Int): String {
     return if (firstMonth == secondMonth) {
-        formatDate(firstMonth)
+        getMonthByNumber(firstMonth)
     } else {
-        "${formatDate(firstMonth)} - ${formatDate(secondMonth)}"
+        "${getMonthByNumber(firstMonth)} - ${getMonthByNumber(secondMonth)}"
     }
 }
 
+/**
+ * Преобразовать строку в формате "dd.mm.yyyy" в [Calendar]
+ *
+ * @param date строка с датой
+ * @return [Calendar]
+ */
 fun parseDateFromString(date: String): Calendar {
     val calendar = Calendar.getInstance()
     return calendar.also {
@@ -46,20 +64,10 @@ fun parseDateFromString(date: String): Calendar {
     }
 }
 
-fun addEventsToMap(events: List<Event>): HashMap<Long, MutableList<Event>> {
-    val map = HashMap<Long, MutableList<Event>>()
-    for (event in events) {
-        val timeInMs = event.timestamp
-        if (map.containsKey(timeInMs)) {
-            map[timeInMs]?.add(event)
-        } else {
-            map[timeInMs] = mutableListOf(event)
-        }
-    }
-    return map
-}
-
-internal fun CalendarDay.parseDateFromCalendarDay(): Long {
+/**
+ * Прпеобразовать из [CalendarDay] в дату в мс
+ */
+fun CalendarDay.parseDateFromCalendarDay(): Long {
     return Calendar.getInstance().also { calendar ->
         calendar.set(this.date.year, this.date.monthValue - 1, this.day)
         calendar.set(Calendar.HOUR, 0)
@@ -71,12 +79,18 @@ internal fun CalendarDay.parseDateFromCalendarDay(): Long {
     }.timeInMillis
 }
 
-internal fun Calendar.formatDateWithWords() =
+/**
+ * Форматировать дату к виду "dd month"
+ */
+fun Calendar.formatDateWithWords() =
     "${this[Calendar.DAY_OF_MONTH]} ${
         this.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     }"
 
-internal fun Calendar.formatDateWithDigits() =
-    SimpleDateFormat(FIREBASE_FORMAT, Locale.getDefault()).format(Date(this.timeInMillis))
+/**
+ * Форматровать дату к виду "dd.mm.yyyy"
+ */
+fun Calendar.formatDateWithDigits() =
+    SimpleDateFormat(FIREBASE_FORMAT, Locale.getDefault()).format(Date(this.timeInMillis)).orEmpty()
 
 const val FIREBASE_FORMAT = "dd.MM.yyyy"

@@ -20,16 +20,15 @@ class NetworkModule {
     fun provideWallApiMapper(): WallApiMapper {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-
         val okHttpClient: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
             .retryOnConnectionFailure(true)
-            .callTimeout(60, TimeUnit.SECONDS)
+            .callTimeout(CALL_TIMEOUT, TimeUnit.SECONDS)
             .addNetworkInterceptor(object : Interceptor {
                 override fun intercept(chain: Interceptor.Chain): Response {
                     val request = chain.request()
                         .newBuilder()
-                        .addHeader("Connection", "close")
+                        .addHeader(CONNECTION_HEADER, CONNECTION_HEADER_VALUE)
                         .build()
                     return chain.proceed(request)
 
@@ -38,10 +37,11 @@ class NetworkModule {
             .build()
 
         val jsonBuilder = Json { ignoreUnknownKeys = true }
+        jsonBuilder.javaClass
 
         return Retrofit.Builder()
             .baseUrl(VK_URL)
-            .addConverterFactory(jsonBuilder.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(jsonBuilder.asConverterFactory(CONTENT_TYPE.toMediaType()))
             //.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(okHttpClient)
             .build()
@@ -49,6 +49,11 @@ class NetworkModule {
     }
 
     companion object {
+        private const val CONNECTION_HEADER = "Connection"
+        private const val CONNECTION_HEADER_VALUE = "close"
+        private const val CONTENT_TYPE = "application/json"
         private const val VK_URL = "https://api.vk.com/method/"
+
+        private const val CALL_TIMEOUT = 60L
     }
 }

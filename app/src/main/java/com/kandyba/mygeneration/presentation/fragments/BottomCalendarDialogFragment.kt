@@ -34,9 +34,8 @@ class BottomCalendarDialogFragment :
         addEventButton = rootView.findViewById(R.id.add_event)
         setAddButtonVisibility()
         addEventButton.setOnClickListener {
-            viewModel.openBottomFragment(
-                AddEventBottomSheetFragment.newInstance(arguments?.getLong(TIME_IN_MS) ?: 0)
-            )
+            val time = arguments?.getLong(TIME_IN_MS) ?: 0
+            viewModel.openBottomFragment(AddEventBottomSheetFragment.newInstance(time))
         }
         eventsRecyclerView = rootView.findViewById(R.id.events_list)
         eventsList = arguments?.getParcelableArrayList<Event>(EVENT_LIST) as ArrayList<Event>
